@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ChangeListManager">
+    <list default="true" id="fb3fd7ca-104c-4c96-b6b7-e8ef56a2c978" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/../.idea/.gitignore" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/codeStyles/Project.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/codeStyles/codeStyleConfig.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/fileTemplates/TypeScript JSX Test File༏ext༏.test.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/fileTemplates/TypeScript Test File༏ext༏.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/fileTemplates/internal/JavaScript File.js" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/fileTemplates/internal/TypeScript File.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/fileTemplates/internal/TypeScript JSX File.tsx" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/inspectionProfiles/Project_Default.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/misc.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/modules.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/scopes/DependencyInjection.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../.idea/vcs.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../jasmine.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../package-lock.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../package.json" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/ContainerGenerator.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DependencyInjection/Container.dist.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/DescriptorEntity.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/FileName.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Generator/FileCreator.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Generator/Generator.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Generator/ObjectGenerator.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/Generator/ObjectGenerator.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/StringHelper.test.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/StringHelper.ts" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../ts-di-container-generator.iml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/../tsconfig.json" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ComposerSettings">
+    <execution />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+  </component>
+  <component name="ProjectId" id="2Nrka88P7IP6wlCmjRCCdL5pvCg" />
+  <component name="ProjectViewState">
+    <option name="autoscrollFromSource" value="true" />
+    <option name="autoscrollToSource" value="true" />
+    <option name="showExcludedFiles" value="false" />
+    <option name="showLibraryContents" value="true" />
+    <option name="showVisibilityIcons" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "WebServerToolWindowFactoryState": "false",
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/endre/IdeaProjects/ts-di-container-generator/src",
+    "vue.rearranger.settings.migration": "true"
+  }
+}]]></component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="fb3fd7ca-104c-4c96-b6b7-e8ef56a2c978" name="Changes" comment="" />
+      <created>1680429648995</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1680429648995</updated>
+      <workItem from="1680429649942" duration="4000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+</project>
