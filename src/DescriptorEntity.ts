@@ -41,7 +41,7 @@ export class ClassEntity {
     }
 
     public toString(): string {
-        return '[Class: ' + this.name + '(' + this.type + ')]';
+        return '[Class: ' + this.name + ']';
     }
 }
 
@@ -55,7 +55,7 @@ export class RequirementEntity {
     }
 
     public toString(): string {
-        return '[Require: ' + this.parameter + ' as ' + this.type + ' from ' + this.import + ']';
+        return '[Require: ' + this.parameter + ':' + this.type + ' from ' + this.import + ']';
     }
 }
 
@@ -74,7 +74,7 @@ export class ImportEntity {
 export default class DescriptorEntity {
     public imports: Array<ImportEntity> = [];
     public requires: Map<AliasName, Array<RequirementEntity>> = new Map<AliasName, Array<RequirementEntity>>();
-    public provides: Array<InterfaceEntity> = [];
+    public provides: Array<InterfaceEntity | ClassEntity> = [];
 
     constructor(
         public file: FileName
@@ -84,7 +84,7 @@ export default class DescriptorEntity {
     public toString(): string {
         const requires: Array<string> = [];
         this.requires.forEach((r, name): void => {
-            requires.push(name + ' needs ' + r.join(', '));
+            requires.push(name + ' needs [\n      ' + r.join(',\n      ') + '\n    ]\n');
         });
         return '[\nDescriptor: ' + this.file +
             '\n  Imports:\n    ' + this.imports.join(',\n    ') +

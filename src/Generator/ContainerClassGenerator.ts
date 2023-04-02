@@ -1,4 +1,4 @@
-import TypeScript, {ClassElement, NodeArray, Statement, ClassDeclaration} from 'typescript';
+import TypeScript, {ClassDeclaration, ClassElement, NodeArray, Statement, VariableStatement} from 'typescript';
 
 export default class ContainerClassGenerator {
     public generate(members: ClassElement[]): NodeArray<Statement> {
@@ -9,25 +9,26 @@ export default class ContainerClassGenerator {
             undefined,
             members
         );
+        const creationStatement: VariableStatement = TypeScript.factory.createVariableStatement(
+            undefined, // [TypeScript.factory.createModifier(SyntaxKind.ConstKeyword)], // const var result
+            TypeScript.factory.createVariableDeclarationList(
+                [
+                    TypeScript.factory.createVariableDeclaration(
+                        'DependencyInjectionContainer',
+                        undefined,
+                        TypeScript.factory.createTypeReferenceNode('Container'),
+                        TypeScript.factory.createNewExpression(
+                            TypeScript.factory.createIdentifier('Container'),
+                            undefined,
+                            []
+                        )
+                    )
+                ]
+            )
+        );
         return TypeScript.factory.createNodeArray<Statement>([
             container,
-            TypeScript.factory.createVariableStatement(
-                undefined,
-                TypeScript.factory.createVariableDeclarationList(
-                    [
-                        TypeScript.factory.createVariableDeclaration(
-                            'DependencyInjectionContainer',
-                            undefined,
-                            TypeScript.factory.createTypeReferenceNode('Container'),
-                            TypeScript.factory.createNewExpression(
-                                TypeScript.factory.createIdentifier('Container'),
-                                undefined,
-                                []
-                            )
-                        )
-                    ]
-                )
-            ),
+            creationStatement,
             TypeScript.factory.createExportAssignment(
                 undefined,
                 undefined,

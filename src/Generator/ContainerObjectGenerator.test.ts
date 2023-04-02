@@ -57,8 +57,15 @@ describe('ContainerObjectGenerator', function () {
         const result: ClassElement[] = generator.generate([descriptor]);
 
         const code: string = generateCode(result);
-        let expectedCode: string = 'public classToCreate: ClassToCreate = ' +
-            'new ClassToCreate(this.otherClass, this.manualInjections.classToCreateNativeValueValue);';
-        expect(code).toContain(expectedCode);
+        expect(code).toContain(
+            'private _classToCreate?: ClassToCreate;'
+        );
+        expect(code).toContain(
+            'public get classToCreate(): ClassToCreate { ' +
+            'if (this._classToCreate)' +
+            '\n        return this._classToCreate;' +
+            '\n    else' +
+            '\n        return this._classToCreate = new ClassToCreate(this.otherClass, this.manualInjections.classToCreateNativeValueValue);'
+        );
     });
 });

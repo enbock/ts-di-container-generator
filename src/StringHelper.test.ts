@@ -11,6 +11,10 @@ describe('StringHelper', function (): void {
         expect(helper.toCamelCase('one', 'two')).toBe('oneTwo');
     });
 
+    it('should convert parts to camel case', function (): void {
+        expect(helper.toPascalCase('one', 'two')).toBe('OneTwo');
+    });
+
     it('should convert to pascal case', function (): void {
         expect(helper.toFirstUpper('word')).toBe('Word');
     });

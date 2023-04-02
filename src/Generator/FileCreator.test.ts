@@ -65,7 +65,8 @@ describe('FileCreator', function () {
         expect(objectGenerator.generate).toHaveBeenCalledWith('test::descriptors:');
         expect(writeFile).toHaveBeenCalledWith(
             'test::targetFile:',
-            `class OutputClass {
+            `// @formatter:off
+class OutputClass {
     public testProperty: string = new TestClass();
 }
 `,

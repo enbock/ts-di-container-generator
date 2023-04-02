@@ -33,7 +33,17 @@ export default class Generator {
 
     private extract(basePath: string, mainFile: FileName, ignoreList: Array<FileName>): void {
         const descriptor: DescriptorEntity = this.extractor.extract(basePath, mainFile);
-        this.pathSanitizer.sanitizeDescriptor(descriptor, ignoreList);
-        console.log('>>>> ' + descriptor);
+        this.pathSanitizer.sanitizeDescriptor(descriptor, ignoreList, basePath);
+
+        console.log('>>>>', descriptor.toString());
+
+        this.descriptors.unshift(descriptor);
+        for (const i of descriptor.imports) {
+            const foundImport: DescriptorEntity | undefined = this.descriptors.find(
+                (d: DescriptorEntity): boolean => d.file == i.file
+            );
+            if (foundImport) continue;
+            this.extract(basePath, i.file, ignoreList);
+        }
     }
 }

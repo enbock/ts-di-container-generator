@@ -33,7 +33,7 @@ export default class FileCreator {
             TypeScript.factory.createToken(SyntaxKind.EndOfFileToken),
             NodeFlags.None
         );
-        const code: string = this.printer.printNode(EmitHint.SourceFile, node, node);
+        const code: string = '// @formatter:off\n' + this.printer.printNode(EmitHint.SourceFile, node, node);
         await this.writeFile(targetFile, code, {flag: 'w'});
     }
 }

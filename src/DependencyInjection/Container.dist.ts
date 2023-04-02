@@ -17,6 +17,7 @@ import PathResolver from '../Generator/Sanitizer/Task/PathResolver';
 import IgnoredFileRemover from '../Generator/Sanitizer/Task/IgnoredFileRemover';
 import RequirementResolver from '../Generator/Sanitizer/Task/RequirementResolver';
 import ImportCleaner from '../Generator/Sanitizer/Task/ImportCleaner';
+import NameGlobalizer from '../Generator/Sanitizer/Task/NameGlobalizer';
 
 class Container {
     private readonly stringHelper: StringHelper = new StringHelper();
@@ -51,7 +52,11 @@ class Container {
         ),
         new IgnoredFileRemover(),
         new RequirementResolver(),
-        new ImportCleaner()
+        new ImportCleaner(),
+        new NameGlobalizer(
+            path.dirname,
+            this.stringHelper
+        )
     );
     public generator: Generator = new Generator(
         this.stringHelper,
