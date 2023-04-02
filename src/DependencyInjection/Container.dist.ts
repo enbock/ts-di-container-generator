@@ -1,4 +1,4 @@
-import Generator from '../Generator/Generator';
+import Generator from '../Generator';
 import StringHelper from '../StringHelper';
 import InjectionExtractor from '../InjectionExtractor/InjectionExtractor';
 import FileCreator from '../Generator/FileCreator';

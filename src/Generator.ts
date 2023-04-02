@@ -1,10 +1,10 @@
-import StringHelper from '../StringHelper';
-import DescriptorEntity from '../DescriptorEntity';
+import StringHelper from './StringHelper';
+import DescriptorEntity from './DescriptorEntity';
 import path from 'path';
-import FileCreator from './FileCreator';
-import FileName from '../FileName';
-import InjectionExtractor from '../InjectionExtractor/InjectionExtractor';
-import Sanitizer from './Sanitizer/Sanitizer';
+import FileCreator from './Generator/FileCreator';
+import FileName from './FileName';
+import InjectionExtractor from './InjectionExtractor/InjectionExtractor';
+import Sanitizer from './Generator/Sanitizer/Sanitizer';
 
 export default class Generator {
     private descriptors: Array<DescriptorEntity> = [];
@@ -31,11 +31,12 @@ export default class Generator {
         );
     }
 
-    private extract(basePath: string, mainFile: FileName, ignoreList: Array<FileName>): void {
-        const descriptor: DescriptorEntity = this.extractor.extract(basePath, mainFile);
+    private extract(basePath: string, file: FileName, ignoreList: Array<FileName>): void {
+
+        const descriptor: DescriptorEntity = this.extractor.extract(basePath, file);
         this.pathSanitizer.sanitizeDescriptor(descriptor, ignoreList, basePath);
 
-        console.log('>>>>', descriptor.toString());
+        console.log(descriptor.toString(), '\n');
 
         this.descriptors.unshift(descriptor);
         for (const i of descriptor.imports) {

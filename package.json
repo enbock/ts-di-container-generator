@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "license": "MIT",
   "author": "Endre Bock <endre@itbock.de>",
+  "main": "src/ContainerGenerator.ts",
   "scripts": {
     "run-container-generator": " node -r ts-node/register src/ContainerGenerator.ts src ContainerGenerator DependencyInjection/Container.dist",
     "test": "ts-node ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json"

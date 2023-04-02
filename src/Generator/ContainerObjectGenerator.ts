@@ -93,8 +93,7 @@ export default class ContainerObjectGenerator {
                     this.stringHelper.toCamelCase(r.type)
                     || 'manualInjections.' + this.stringHelper.toCamelCase(
                         givenClass.name,
-                        r.parameter,
-                        'Value'
+                        r.parameter
                     )
                 )
             )

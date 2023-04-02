@@ -86,7 +86,8 @@ export default class DescriptorEntity {
         this.requires.forEach((r, name): void => {
             requires.push(name + ' needs [\n      ' + r.join(',\n      ') + '\n    ]\n');
         });
-        return '[\nDescriptor: ' + this.file +
+        return '[Descriptor:' +
+            '\n  File:' + this.file +
             '\n  Imports:\n    ' + this.imports.join(',\n    ') +
             '\n  Requires:\n    ' + requires.join(',\n    ') +
             '\n  Provides:\n    ' + this.provides.join(', ')

@@ -65,7 +65,7 @@ describe('ContainerObjectGenerator', function () {
             'if (this._classToCreate)' +
             '\n        return this._classToCreate;' +
             '\n    else' +
-            '\n        return this._classToCreate = new ClassToCreate(this.otherClass, this.manualInjections.classToCreateNativeValueValue);'
+            '\n        return this._classToCreate = new ClassToCreate(this.otherClass, this.manualInjections.classToCreateNativeValue);'
         );
     });
 });
