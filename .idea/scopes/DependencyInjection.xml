@@ -1,0 +1,3 @@
+<component name="DependencyValidationManager">
+  <scope name="DependencyInjection" pattern="(src:*.DependencyInjection.*||src:*.DependencyInjection..*)&amp;&amp;!file[Einkaufszettel]:src/DependencyInjection//*||file[Einkaufszettel]:src/DependencyInjection/*" />
+</component>
