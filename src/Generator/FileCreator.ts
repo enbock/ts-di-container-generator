@@ -13,6 +13,7 @@ import StringHelper from '../StringHelper';
 import DescriptorEntity from '../DescriptorEntity';
 import ContainerObjectGenerator from './ContainerObjectGenerator';
 import ContainerClassGenerator from './ContainerClassGenerator';
+import ImportGenerator from './ImportGenerator';
 
 export default class FileCreator {
     private printer: Printer = TypeScript.createPrinter({newLine: TypeScript.NewLineKind.LineFeed});
@@ -21,13 +22,17 @@ export default class FileCreator {
         private stringHelper: StringHelper,
         private statementGenerator: ContainerClassGenerator,
         private objectGenerator: ContainerObjectGenerator,
-        private writeFile: typeof fs.promises.writeFile
+        private writeFile: typeof fs.promises.writeFile,
+        private importGenerator: ImportGenerator
     ) {
     }
 
     public async generate(descriptors: DescriptorEntity[], basePath: string, targetFile: string): Promise<void> {
         const members: ClassElement[] = this.objectGenerator.generate(descriptors);
-        const statements: NodeArray<Statement> = this.statementGenerator.generate(members);
+        const statements: NodeArray<Statement> = TypeScript.factory.createNodeArray([
+            ...this.importGenerator.generate(descriptors, basePath, targetFile),
+            ...this.statementGenerator.generate(members)
+        ]);
         let node: SourceFile = TypeScript.factory.createSourceFile(
             statements,
             TypeScript.factory.createToken(SyntaxKind.EndOfFileToken),

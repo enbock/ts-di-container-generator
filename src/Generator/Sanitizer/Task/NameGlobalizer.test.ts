@@ -1,8 +1,7 @@
 import NameGlobalizer from './NameGlobalizer';
 import path from 'path';
 import StringHelper from '../../../StringHelper';
-import DescriptorEntity, {ClassEntity} from '../../../DescriptorEntity';
-import MockedObject from '../../../MockedObject';
+import DescriptorEntity, {ClassEntity, RequirementEntity} from '../../../DescriptorEntity';
 import Spy = jasmine.Spy;
 
 describe('NameGlobalizer', function (): void {
@@ -19,10 +18,20 @@ describe('NameGlobalizer', function (): void {
     });
 
     it('should make the name of given classes global non conflict-able', async function (): Promise<void> {
-        dirname.and.returnValue('root/src/Domain/Name');
+        dirname.and.returnValues(
+            'root/src/Domain/Name',
+            'root/src/OtherDomain',
+            'root/src/OtherDomain'
+        );
 
         const descriptor: DescriptorEntity = new DescriptorEntity('root/src/Domain/Name/Example');
-        descriptor.requires.set('ExampleClass', 'test::requirements:' as MockedObject);
+        const requirement: RequirementEntity = new RequirementEntity(
+            'test::replacedByClassPathToBeGlobalEqual:',
+            'RequiredClass'
+        );
+        requirement.import.file = 'root/src/OtherDomain/RequiredClass';
+        requirement.import.alias.name = 'RequiredClass';
+        descriptor.requires.set('ExampleClass', [requirement]);
         const classItem: ClassEntity = new ClassEntity('ExampleClass');
         descriptor.provides = [classItem];
 
@@ -30,6 +39,8 @@ describe('NameGlobalizer', function (): void {
 
         expect(dirname).toHaveBeenCalledWith('root/src/Domain/Name/Example');
         expect(classItem.name).toBe('DomainNameExampleClass');
-        expect(descriptor.requires.get('DomainNameExampleClass')).toBe('test::requirements:' as MockedObject);
+        expect(descriptor.requires.get('DomainNameExampleClass')).toEqual([requirement]);
+        expect(requirement.import.alias.name).toBe('OtherDomainRequiredClass');
+        expect(requirement.parameter).toBe('otherDomainRequiredClass');
     });
 });

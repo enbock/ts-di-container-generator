@@ -18,6 +18,7 @@ import IgnoredFileRemover from '../Generator/Sanitizer/Task/IgnoredFileRemover';
 import RequirementResolver from '../Generator/Sanitizer/Task/RequirementResolver';
 import ImportCleaner from '../Generator/Sanitizer/Task/ImportCleaner';
 import NameGlobalizer from '../Generator/Sanitizer/Task/NameGlobalizer';
+import ImportGenerator from '../Generator/ImportGenerator';
 
 class Container {
     private readonly stringHelper: StringHelper = new StringHelper();
@@ -38,11 +39,15 @@ class Container {
     private readonly objectGenerator: ContainerObjectGenerator = new ContainerObjectGenerator(
         this.stringHelper
     );
+    private readonly importGenerator: ImportGenerator = new ImportGenerator(
+        path.dirname
+    );
     private readonly fileCreator: FileCreator = new FileCreator(
         this.stringHelper,
         this.containerClassGenerator,
         this.objectGenerator,
-        fs.promises.writeFile
+        fs.promises.writeFile,
+        this.importGenerator
     );
     private readonly pathSanitizer: Sanitizer = new Sanitizer(
         new GlobalImportRemover(),
