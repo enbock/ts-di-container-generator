@@ -1,3 +1,5 @@
+#!/usr/bin/env ts-node
+
 import path from 'path';
 import FileName from './FileName';
 import Generator from './Generator';
