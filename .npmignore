@@ -2,3 +2,4 @@
 jasmine.json
 src/**/*.test.*
 src/DependencyInjection/Container.ts
+*.iml

@@ -1,5 +1,7 @@
 # Dependency Injection Container Generator for TypeScript
 
+A generator to automatically create a dependency injection container by static code analysis.
+
 ## Motivation
 
 TODO Explain history in compare with C++,# and Java
