@@ -23,5 +23,10 @@
     "jasmine": "^4",
     "jasmine-auto-spies": "^7",
     "tsconfig-paths": "^4.2.0"
-  }
+  },
+  "workspaces": [
+    "App",
+    "Core",
+    "NodeInfrastructure"
+  ]
 }

@@ -20,6 +20,9 @@
     "outDir": "./build",
     "baseUrl": ".",
     "paths": {
+      "App/*": [
+        "App/src/*"
+      ],
       "Core/*": [
         "Core/src/*"
       ],

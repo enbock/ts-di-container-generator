@@ -1,9 +1,9 @@
 import StringHelper from 'Core/StringHelper';
 import DescriptorEntity from 'Core/DescriptorEntity';
 import path from 'path';
-import Controller from './Controller/Controller';
 import FileName from 'Core/FileName';
-import InjectionExtractor from './InjectionExtractor/InjectionExtractor';
+import InjectionExtractor from 'Core/InjectionExtractor/InjectionExtractor';
+import Controller from 'App/Controller/Controller';
 import Sanitizer from 'Core/Generator/Sanitizer/Sanitizer';
 
 export default class Generator {
