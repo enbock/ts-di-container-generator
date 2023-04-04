@@ -1,27 +1,19 @@
 {
   "name": "@enbock/ts-di-container-generator",
-  "version": "0.1.0-dev14",
+  "version": "0.1.0-dev15",
   "license": "MIT",
   "author": "Endre Bock <endre@itbock.de>",
-  "main": "src/ContainerGenerator.ts",
-  "bin": "src/ContainerGenerator.ts",
+  "bin": "App/src/ContainerGenerator.ts",
   "publishConfig": {
     "access": "public"
-  },
-  "scripts": {
-    "start": "ts-node src/ContainerGenerator.ts",
-    "test:run": "npx . src ContainerGenerator",
-    "test:unit": "ts-node ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json"
   },
   "dependencies": {
     "ts-node": "^10",
     "tslib": "^2",
     "typescript": "^5"
   },
-  "devDependencies": {
-    "@types/jasmine": "^4",
-    "@types/node": "^18",
-    "jasmine": "^4",
-    "jasmine-auto-spies": "^7"
+  "scripts": {
+    "start": "ts-node App/src/ContainerGenerator.ts",
+    "test:run": "npx . App/src ContainerGenerator"
   }
 }

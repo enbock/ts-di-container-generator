@@ -26,4 +26,4 @@ npx @enbock/ts-di-container-generator src index
 
 ## License
 
-[MIT](./LICENSE)
+[MIT](App/LICENSE)
