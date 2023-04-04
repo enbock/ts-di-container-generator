@@ -27,6 +27,7 @@ describe('NameGlobalizer', function (): void {
         const descriptor: DescriptorEntity = new DescriptorEntity('root/src/Domain/Name/Example');
         const requirement: RequirementEntity = new RequirementEntity(
             'test::replacedByClassPathToBeGlobalEqual:',
+            false,
             'RequiredClass'
         );
         requirement.import.file = 'root/src/OtherDomain/RequiredClass';

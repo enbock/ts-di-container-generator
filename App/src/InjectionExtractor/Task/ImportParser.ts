@@ -8,8 +8,8 @@ import TypeScript, {
     SyntaxKind
 } from 'typescript';
 import ParsingTask from './ParsingTask';
-import FileName from '../../FileName';
-import DescriptorEntity, {AliasEntity, ImportEntity} from '../../DescriptorEntity';
+import FileName from 'Core/FileName';
+import DescriptorEntity, {AliasEntity, ImportEntity} from 'Core/DescriptorEntity';
 
 export default class ImportParser implements ParsingTask {
     public parse(node: Node, result: DescriptorEntity): void {

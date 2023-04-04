@@ -2,10 +2,10 @@ import InjectionExtractor from './InjectionExtractor';
 import ParsingTask from './Task/ParsingTask';
 import fs from 'fs';
 import {Node} from 'typescript';
-import MockedObject from '../MockedObject';
+import MockedObject from 'Core/MockedObject';
 import {createSpyFromClass, Spy} from 'jasmine-auto-spies';
 import ClassParser from './Task/ClassParser';
-import DescriptorEntity from '../DescriptorEntity';
+import DescriptorEntity from 'Core/DescriptorEntity';
 import path from 'path';
 
 describe('InjectionExtractor', function (): void {

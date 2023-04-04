@@ -1,6 +1,6 @@
 import ParsingTask from './ParsingTask';
 import TypeScript, {ClassDeclaration, ConstructorDeclaration, Identifier, Node, ParameterDeclaration} from 'typescript';
-import DescriptorEntity, {ClassEntity, RequirementEntity} from '../../DescriptorEntity';
+import DescriptorEntity, {ClassEntity, RequirementEntity} from 'Core/DescriptorEntity';
 
 export default class ClassParser implements ParsingTask {
     public parse(node: Node, result: DescriptorEntity): void {
@@ -24,7 +24,7 @@ export default class ClassParser implements ParsingTask {
     }
 
     private addRequirement(node: ParameterDeclaration, requirements: RequirementEntity[]): void {
-        const requirement: RequirementEntity = new RequirementEntity('', '');
+        const requirement: RequirementEntity = new RequirementEntity('');
 
         requirement.parameter = String((node.name as Identifier).escapedText || '');
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env ts-node
 
 import path from 'path';
-import FileName from './FileName';
+import FileName from 'Core/FileName';
 import Generator from './Generator';
 import DependencyInjectionContainer from './DependencyInjection/Container.dist';
 

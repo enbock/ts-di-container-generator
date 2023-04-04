@@ -1,6 +1,6 @@
 import ImportParser from './ImportParser';
 import TypeScript, {Node, SourceFile} from 'typescript';
-import DescriptorEntity, {AliasEntity, ImportEntity} from '../../DescriptorEntity';
+import DescriptorEntity, {AliasEntity, ImportEntity} from 'Core/DescriptorEntity';
 
 describe('ImportParser', function (): void {
     let parser: ImportParser;

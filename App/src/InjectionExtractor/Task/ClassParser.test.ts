@@ -1,6 +1,6 @@
 import ClassParser from './ClassParser';
 import TypeScript, {Node, SourceFile} from 'typescript';
-import DescriptorEntity, {AliasName, ClassEntity, RequirementEntity} from '../../DescriptorEntity';
+import DescriptorEntity, {AliasName, ClassEntity, RequirementEntity} from 'Core/DescriptorEntity';
 
 describe('ClassParser', function (): void {
     let parser: ClassParser;
@@ -42,7 +42,7 @@ describe('ClassParser', function (): void {
             parser.parse(node, result);
         });
         expect(result.provides).toEqual([new ClassEntity('TestClass')]);
-        const otherObjectRequirement: RequirementEntity = new RequirementEntity('otherObject', 'OtherClass');
+        const otherObjectRequirement: RequirementEntity = new RequirementEntity('otherObject', false, 'OtherClass');
         const nativeValueRequirement: RequirementEntity = new RequirementEntity('nativeValue');
         const expectedRequirements: Map<AliasName, RequirementEntity[]> = new Map<AliasName, RequirementEntity[]>(
             [

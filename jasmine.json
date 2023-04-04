@@ -1,8 +1,8 @@
 {
   "spec_dir": ".",
   "spec_files": [
-    "**/*.test.ts",
-    "*.test.ts"
+    "App/src/**/*.test.ts",
+    "Core/src/**/*.test.ts"
   ],
   "helpers": [
   ],

@@ -1,36 +1,41 @@
 {
   "compilerOptions": {
     "target": "ESNext",
-    "module": "CommonJS",
-    "strict": true,
-    "importHelpers": true,
-    "moduleResolution": "node",
-    "experimentalDecorators": true,
+    "module": "NodeNext",
+    "lib": [
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "types": [
-      "node",
-      "jasmine"
-    ],
-    "typeRoots": [
-      "node_modules/@types"
-    ],
-    "lib": [
-      "esnext",
-      "scripthost",
-      "es2015",
-      "dom"
-    ],
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noFallthroughCasesInSwitch": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noEmit": false,
+    "noImplicitAny": true,
+    "outDir": "./build",
+    "baseUrl": ".",
     "paths": {
       "Core/*": [
-        "../Core/src/* "
+        "Core/src/*"
+      ],
+      "Infrastructure/*": [
+        "NodeInfrastructure/src/*"
       ]
     }
   },
   "include": [
-    "src"
+    "App/src/**/*",
+    "Core/src/**/*",
+    "Infrastructure/src/**/*"
   ],
-  "exclude": [
-    "node_modules"
-  ]
+  "ts-node": {
+    "require": [
+      "tsconfig-paths/register"
+    ]
+  }
 }

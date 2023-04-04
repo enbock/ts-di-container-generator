@@ -1,6 +1,6 @@
 import InterfaceParser from './InterfaceParser';
 import TypeScript, {Node, SourceFile} from 'typescript';
-import DescriptorEntity, {InterfaceEntity} from '../../DescriptorEntity';
+import DescriptorEntity, {InterfaceEntity} from 'Core/DescriptorEntity';
 
 describe('InterfaceParser', function (): void {
     let parser: InterfaceParser;

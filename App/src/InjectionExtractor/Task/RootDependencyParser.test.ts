@@ -1,6 +1,6 @@
 import RootDependencyParser from './RootDependencyParser';
 import TypeScript, {Node, SourceFile} from 'typescript';
-import DescriptorEntity, {RequirementEntity} from '../../DescriptorEntity';
+import DescriptorEntity, {RequirementEntity} from 'Core/DescriptorEntity';
 
 describe('RootDependencyParser', function (): void {
     let rootDependencyParser: RootDependencyParser;
@@ -19,7 +19,7 @@ describe('RootDependencyParser', function (): void {
         });
 
         const expectedRequirement: Map<string, Array<RequirementEntity>> = new Map();
-        expectedRequirement.set('', [new RequirementEntity('', 'ThisDependency')]);
+        expectedRequirement.set('', [new RequirementEntity('', false, 'ThisDependency')]);
         expect(result.requires.keys()).toEqual(expectedRequirement.keys());
         expect(result.requires.values()).toEqual(expectedRequirement.values());
     });

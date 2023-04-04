@@ -40,8 +40,8 @@ describe('ContainerObjectGenerator', function () {
 
     it('should generates an property for a class', async function (): Promise<void> {
         const descriptor: DescriptorEntity = new DescriptorEntity('test::file:');
-        const objectRequirement: RequirementEntity = new RequirementEntity('injectedClass', 'OtherClass');
-        const nativeTypeRequirement: RequirementEntity = new RequirementEntity('nativeValue');
+        const objectRequirement: RequirementEntity = new RequirementEntity('injectedClass', false, 'OtherClass');
+        const nativeTypeRequirement: RequirementEntity = new RequirementEntity('nativeValue', false);
         descriptor.requires = new Map<AliasName, RequirementEntity[]>(
             [
                 [

@@ -1,10 +1,10 @@
-import StringHelper from './StringHelper';
-import DescriptorEntity from './DescriptorEntity';
+import StringHelper from 'Core/StringHelper';
+import DescriptorEntity from 'Core/DescriptorEntity';
 import path from 'path';
-import FileCreator from './Generator/FileCreator';
-import FileName from './FileName';
+import Controller from './Controller/Controller';
+import FileName from 'Core/FileName';
 import InjectionExtractor from './InjectionExtractor/InjectionExtractor';
-import Sanitizer from './Generator/Sanitizer/Sanitizer';
+import Sanitizer from 'Core/Generator/Sanitizer/Sanitizer';
 
 export default class Generator {
     private descriptors: Array<DescriptorEntity> = [];
@@ -12,7 +12,7 @@ export default class Generator {
     constructor(
         private stringHelper: StringHelper,
         private extractor: InjectionExtractor,
-        private fileCreator: FileCreator,
+        private fileCreator: Controller,
         private pathSanitizer: Sanitizer
     ) {
     }

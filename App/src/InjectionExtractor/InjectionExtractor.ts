@@ -1,7 +1,7 @@
 import TypeScript, {Node, Program, SourceFile} from 'typescript';
 import ParsingTask from './Task/ParsingTask';
-import FileName from '../FileName';
-import DescriptorEntity from '../DescriptorEntity';
+import FileName from 'Core/FileName';
+import DescriptorEntity from 'Core/DescriptorEntity';
 import path from 'path';
 
 export default class InjectionExtractor {

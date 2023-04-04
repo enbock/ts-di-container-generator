@@ -1,5 +1,5 @@
 import ParsingTask from './ParsingTask';
-import DescriptorEntity, {RequirementEntity} from '../../DescriptorEntity';
+import DescriptorEntity, {RequirementEntity} from 'Core/DescriptorEntity';
 import TypeScript, {
     Identifier,
     Node,
@@ -23,7 +23,7 @@ export default class RootDependencyParser implements ParsingTask {
             ((rootDependency.type as TypeReferenceNode | undefined)?.typeName as Identifier).escapedText || '';
 
         const globalRequire: Array<RequirementEntity> = result.requires.get('') || [];
-        globalRequire.push(new RequirementEntity('', requiredClass));
+        globalRequire.push(new RequirementEntity('', false, requiredClass));
         result.requires.set('', globalRequire);
     }
 }

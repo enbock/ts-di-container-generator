@@ -1,24 +1,26 @@
 import Generator from '../Generator';
-import StringHelper from '../StringHelper';
+import StringHelper from 'Core/StringHelper';
 import InjectionExtractor from '../InjectionExtractor/InjectionExtractor';
-import FileCreator from '../Generator/FileCreator';
+import Controller from '../Controller/Controller';
 import ClassParser from '../InjectionExtractor/Task/ClassParser';
 import ImportParser from '../InjectionExtractor/Task/ImportParser';
 import InterfaceParser from '../InjectionExtractor/Task/InterfaceParser';
-import ContainerClassGenerator from '../Generator/ContainerClassGenerator';
-import ContainerObjectGenerator from '../Generator/ContainerObjectGenerator';
+import ContainerClassGenerator from 'Core/Generator/ContainerClassGenerator';
+import ContainerObjectGenerator from 'Core/Generator/ContainerObjectGenerator';
 import fs from 'fs';
 import ParsingTask from '../InjectionExtractor/Task/ParsingTask';
-import Sanitizer from '../Generator/Sanitizer/Sanitizer';
+import Sanitizer from 'Core/Generator/Sanitizer/Sanitizer';
 import RootDependencyParser from '../InjectionExtractor/Task/RootDependencyParser';
 import path from 'path';
-import GlobalImportRemover from '../Generator/Sanitizer/Task/GlobalImportRemover';
-import PathResolver from '../Generator/Sanitizer/Task/PathResolver';
-import IgnoredFileRemover from '../Generator/Sanitizer/Task/IgnoredFileRemover';
-import RequirementResolver from '../Generator/Sanitizer/Task/RequirementResolver';
-import ImportCleaner from '../Generator/Sanitizer/Task/ImportCleaner';
-import NameGlobalizer from '../Generator/Sanitizer/Task/NameGlobalizer';
-import ImportGenerator from '../Generator/ImportGenerator';
+import GlobalImportRemover from 'Core/Generator/Sanitizer/Task/GlobalImportRemover';
+import PathResolver from 'Core/Generator/Sanitizer/Task/PathResolver';
+import IgnoredFileRemover from 'Core/Generator/Sanitizer/Task/IgnoredFileRemover';
+import RequirementResolver from 'Core/Generator/Sanitizer/Task/RequirementResolver';
+import ImportCleaner from 'Core/Generator/Sanitizer/Task/ImportCleaner';
+import NameGlobalizer from 'Core/Generator/Sanitizer/Task/NameGlobalizer';
+import ImportGenerator from 'Core/Generator/ImportGenerator';
+import Presenter from '../Controller/Presenter';
+import GeneratorInteractor from 'Core/Generator/Interactor/Interactor';
 
 class Container {
     private readonly stringHelper: StringHelper = new StringHelper();
@@ -42,12 +44,18 @@ class Container {
     private readonly importGenerator: ImportGenerator = new ImportGenerator(
         path.dirname
     );
-    private readonly fileCreator: FileCreator = new FileCreator(
+    private readonly generatorInteractor: GeneratorInteractor = new GeneratorInteractor(
         this.stringHelper,
         this.containerClassGenerator,
         this.objectGenerator,
-        fs.promises.writeFile,
         this.importGenerator
+    );
+    private readonly controller: Controller = new Controller(
+        this.generatorInteractor,
+        new Presenter(
+            this.stringHelper,
+            fs.promises.writeFile
+        )
     );
     private readonly pathSanitizer: Sanitizer = new Sanitizer(
         new GlobalImportRemover(),
@@ -66,7 +74,7 @@ class Container {
     public generator: Generator = new Generator(
         this.stringHelper,
         this.injectionExtractor,
-        this.fileCreator,
+        this.controller,
         this.pathSanitizer
     );
 }
