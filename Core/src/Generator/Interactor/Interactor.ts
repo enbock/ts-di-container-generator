@@ -6,7 +6,7 @@ import ts, {ClassElement} from 'typescript';
 import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
 import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import FileName from 'Core/File/FileName';
-import DescriptorEntity from 'Core/DescriptorEntity';
+import DescriptorEntity, {ClassEntity, ImportEntity, InterfaceEntity, Type} from 'Core/DescriptorEntity';
 import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
 import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
 
@@ -22,17 +22,41 @@ export default class Interactor {
 
     public loadAndGenerate(request: GenerateRequest, response: GenerateResponse): void {
         const failedDescriptors: Array<FailedDescriptorEntity> = [];
-        const descriptors: Array<DescriptorEntity> = this.fileExtractor.extract(
+        let descriptors: Array<DescriptorEntity> = [];
+        this.fileExtractor.extract(
             request.basePath,
             request.mainFile,
             request.ignoreList,
-            failedDescriptors
+            failedDescriptors,
+            descriptors
         );
+        this.removeUnusedClasses(descriptors);
 
         console.log('Failed:', failedDescriptors);
         console.log('Loaded:', descriptors.join('\n'));
 
         response.statements = this.generateStructure(request.basePath, request.mainFile, descriptors);
+    }
+
+    private removeUnusedClasses(descriptors: Array<DescriptorEntity>): void {
+        const allImports: Array<ImportEntity> = descriptors
+            .map((d: DescriptorEntity): Array<ImportEntity> => d.imports)
+            .flat()
+        ;
+        descriptors.forEach(
+            (d: DescriptorEntity): void => {
+                d.provides = d.provides.filter(
+                    (p: InterfaceEntity | ClassEntity): boolean => {
+                        const result: boolean = p.type == Type.INTERFACE
+                            || allImports.find(
+                                (i: ImportEntity): boolean => i.alias.name == p.name
+                            ) !== undefined;
+                        if (!result) console.log('Removed::', p);
+                        return result;
+                    }
+                );
+            }
+        );
     }
 
     private generateStructure(

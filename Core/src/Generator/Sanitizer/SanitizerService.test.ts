@@ -9,6 +9,7 @@ import NameGlobalizer from './Task/NameGlobalizer';
 import FileClient from 'Core/File/FileClient';
 import FileName from 'Core/File/FileName';
 import DescriptorEntity from 'Core/DescriptorEntity';
+import FallbackRequireNameCreator from 'Core/Generator/Sanitizer/Task/FallbackRequireNameCreator';
 
 describe('SanitizerService', function (): void {
     let sanitizer: SanitizerService,
@@ -17,7 +18,8 @@ describe('SanitizerService', function (): void {
         ignoredFileRemover: Spy<IgnoredFileRemover>,
         requirementResolver: Spy<RequirementResolver>,
         importCleaner: Spy<ImportCleaner>,
-        nameGlobalizer: Spy<NameGlobalizer>
+        nameGlobalizer: Spy<NameGlobalizer>,
+        fallbackRequireNameCreator: Spy<FallbackRequireNameCreator>
     ;
 
     beforeEach(function (): void {
@@ -36,6 +38,7 @@ describe('SanitizerService', function (): void {
         requirementResolver = createSpyFromClass(RequirementResolver);
         importCleaner = createSpyFromClass(ImportCleaner);
         nameGlobalizer = createSpyFromClass(NameGlobalizer);
+        fallbackRequireNameCreator = createSpyFromClass(FallbackRequireNameCreator);
 
         sanitizer = new SanitizerService(
             globalImportRemover,
@@ -43,7 +46,8 @@ describe('SanitizerService', function (): void {
             ignoredFileRemover,
             requirementResolver,
             importCleaner,
-            nameGlobalizer
+            nameGlobalizer,
+            fallbackRequireNameCreator
         );
     });
 
@@ -60,5 +64,6 @@ describe('SanitizerService', function (): void {
         expect(requirementResolver.revolveRequiredImports).toHaveBeenCalledWith('test::descriptor:');
         expect(importCleaner.removeUnneededImports).toHaveBeenCalledWith('test::descriptor:');
         expect(nameGlobalizer.makeClassesGlobalUnique).toHaveBeenCalledWith('test::descriptor:', 'test::basePath:');
+        expect(fallbackRequireNameCreator.addRequireName).toHaveBeenCalledWith('test::descriptor:', 'test::basePath:');
     });
 });

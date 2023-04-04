@@ -90,9 +90,10 @@ export default class ContainerObjectGenerator {
         return requirements.map(
             (r: RequirementEntity): Identifier => TypeScript.factory.createIdentifier(
                 'this.' + (
-                    r.type
+                    r.type && r.import.file
                         ? r.parameter
-                        : 'manualInjections.' + this.stringHelper.toCamelCase(givenClass.name, r.parameter)
+                        : 'manualInjections.' +
+                        this.stringHelper.toCamelCase(givenClass.name, r.type || r.parameter)
                 )
             )
         );

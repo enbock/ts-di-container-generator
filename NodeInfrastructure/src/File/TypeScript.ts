@@ -39,7 +39,7 @@ export default class TypeScript implements FileClient {
         }
         if (sourceFile === undefined) throw new FileError();
 
-        const result: DescriptorEntity = new DescriptorEntity(modulePath, this.dirname(modulePath));
+        const result: DescriptorEntity = new DescriptorEntity(modulePath);
         ts.forEachChild(sourceFile, (node: Node): void => {
             this.parsers.forEach((task: Parser) => task.parse(node, result));
         });

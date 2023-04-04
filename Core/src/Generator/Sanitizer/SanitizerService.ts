@@ -6,6 +6,7 @@ import RequirementResolver from './Task/RequirementResolver';
 import ImportCleaner from './Task/ImportCleaner';
 import NameGlobalizer from './Task/NameGlobalizer';
 import FileClient from 'Core/File/FileClient';
+import FallbackRequireNameCreator from 'Core/Generator/Sanitizer/Task/FallbackRequireNameCreator';
 
 export default class SanitizerService {
     constructor(
@@ -14,7 +15,8 @@ export default class SanitizerService {
         private ignoredFileRemover: IgnoredFileRemover,
         private requirementResolver: RequirementResolver,
         private importCleaner: ImportCleaner,
-        private nameGlobalizer: NameGlobalizer
+        private nameGlobalizer: NameGlobalizer,
+        private fallbackRequireNameCreator: FallbackRequireNameCreator
     ) {
     }
 
@@ -25,5 +27,6 @@ export default class SanitizerService {
         this.requirementResolver.revolveRequiredImports(descriptor);
         this.importCleaner.removeUnneededImports(descriptor);
         this.nameGlobalizer.makeClassesGlobalUnique(descriptor, basePath);
+        this.fallbackRequireNameCreator.addRequireName(descriptor, basePath);
     }
 }

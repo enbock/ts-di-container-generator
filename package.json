@@ -1,6 +1,6 @@
 {
   "name": "@enbock/ts-di-container-generator",
-  "version": "0.1.0-dev32",
+  "version": "0.1.0-dev34",
   "license": "MIT",
   "author": "Endre Bock <endre@itbock.de>",
   "publishConfig": {
@@ -8,7 +8,8 @@
   },
   "bin": "runner.js",
   "scripts": {
-    "build": "webpack --mode production",
+    "build:dev": "bash -c 'rm App/src/DependencyInjection/Container.ts ; npm run build:production'",
+    "build:production": "webpack --mode production",
     "test:unit": "ts-node ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json",
     "test:native-run": "ts-node App/src/ContainerGenerator.ts App/src ContainerGenerator",
     "test:npx-run": "npx . App/src ContainerGenerator"

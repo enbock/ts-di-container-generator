@@ -20,6 +20,7 @@ import ImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
 import Presenter from '../Controller/Presenter';
 import GeneratorInteractor from 'Core/Generator/Interactor/Interactor';
 import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
+import FallbackRequireNameCreator from 'Core/Generator/Sanitizer/Task/FallbackRequireNameCreator';
 
 class Container {
     private readonly stringHelper: StringHelper = new StringHelper();
@@ -52,6 +53,10 @@ class Container {
         new RequirementResolver(),
         new ImportCleaner(),
         new NameGlobalizer(
+            path.dirname,
+            this.stringHelper
+        ),
+        new FallbackRequireNameCreator(
             path.dirname,
             this.stringHelper
         )

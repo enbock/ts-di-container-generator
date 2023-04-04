@@ -8,6 +8,9 @@ import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import MockedObject from 'Core/MockedObject';
 import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
 import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
+import FileName from 'Core/File/FileName';
+import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
+import DescriptorEntity from 'Core/DescriptorEntity';
 
 describe('Interactor', function (): void {
     let interactor: Interactor,
@@ -33,10 +36,23 @@ describe('Interactor', function (): void {
     });
 
     it('should generate the container structure', async function (): Promise<void> {
+        const descriptor: DescriptorEntity = new DescriptorEntity('test::descriptor:');
+
         objectGenerator.generate.and.returnValue(['test::objectMembers:']);
         importGenerator.generate.and.returnValue(['test::importStatements:']);
         statementGenerator.generate.and.returnValue(['test::objectStatements']);
-        fileExtractor.extract.and.returnValue(['test::descriptor:' as MockedObject]);
+        fileExtractor.extract.and.callFake(
+            function (
+                basePath: string,
+                file: FileName,
+                ignoreList: Array<FileName>,
+                failedDescriptors: Array<FailedDescriptorEntity>,
+                descriptors: Array<DescriptorEntity>
+            ): void {
+                failedDescriptors.push('test::failedDescriptor:' as MockedObject);
+                descriptors.push(descriptor as MockedObject);
+            }
+        );
 
         const response: GenerateResponse = {statements: []};
         const request: GenerateRequest = {
@@ -50,11 +66,12 @@ describe('Interactor', function (): void {
             'test::basePath:',
             'test::targetFile:',
             'test::ignoreList:',
-            []
+            ['test::failedDescriptor:'],
+            [descriptor]
         );
-        expect(objectGenerator.generate).toHaveBeenCalledWith(['test::descriptor:']);
+        expect(objectGenerator.generate).toHaveBeenCalledWith([descriptor]);
         expect(importGenerator.generate).toHaveBeenCalledWith(
-            ['test::descriptor:'],
+            [descriptor],
             'test::basePath:',
             'test::targetFile:'
         );

@@ -20,7 +20,7 @@ export class AliasEntity {
 }
 
 export class InterfaceEntity {
-    public type: Type = Type.INTERFACE;
+    public readonly type: Type = Type.INTERFACE;
 
     constructor(
         public name: string
@@ -33,7 +33,7 @@ export class InterfaceEntity {
 }
 
 export class ClassEntity {
-    public type: Type = Type.CLASS;
+    public readonly type: Type = Type.CLASS;
 
     constructor(
         public name: string
@@ -78,8 +78,7 @@ export default class DescriptorEntity {
     public provides: Array<InterfaceEntity | ClassEntity> = [];
 
     constructor(
-        public file: FileName,
-        public basePath: string = ''
+        public file: FileName
     ) {
     }
 
@@ -90,7 +89,6 @@ export default class DescriptorEntity {
         });
         return '[Descriptor:' +
             '\n  File:' + this.file +
-            '\n  Base:' + this.basePath +
             '\n  Imports:\n    ' + this.imports.join(',\n    ') +
             '\n  Requires:\n    ' + requires.join(',\n    ') +
             '\n  Provides:\n    ' + this.provides.join(', ')
