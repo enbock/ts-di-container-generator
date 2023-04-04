@@ -1,20 +1,23 @@
 {
   "name": "@enbock/ts-di-container-generator",
-  "version": "0.1.0-dev18",
+  "version": "0.1.0-dev30",
   "license": "MIT",
   "author": "Endre Bock <endre@itbock.de>",
   "publishConfig": {
     "access": "public"
   },
-  "bin": "App/src/ContainerGenerator.ts",
+  "bin": "runner.js",
   "scripts": {
-    "start": "ts-node App/src/ContainerGenerator.ts",
+    "test:native-run": "ts-node -r tsconfig-paths/register App/src/ContainerGenerator.ts App/src ContainerGenerator",
+    "test:unit": "node -r ts-node/register ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json",
+    "build": "webpack --mode production",
     "test:run": "npx . App/src ContainerGenerator",
-    "test:unit": "node -r ts-node/register ./node_modules/jasmine/bin/jasmine.js --config=jasmine.json"
+    "start": "ts-node runner.js"
   },
   "dependencies": {
     "ts-node": "^10",
     "tslib": "^2",
+    "tsconfig-paths": "^4",
     "typescript": "^5"
   },
   "devDependencies": {
@@ -22,11 +25,8 @@
     "@types/node": "^18",
     "jasmine": "^4",
     "jasmine-auto-spies": "^7",
-    "tsconfig-paths": "^4"
-  },
-  "workspaces": [
-    "App",
-    "Core",
-    "NodeInfrastructure"
-  ]
+    "ts-loader": "^9.4.2",
+    "webpack": "^5",
+    "webpack-cli": "^5"
+  }
 }

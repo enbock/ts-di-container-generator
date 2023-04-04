@@ -8,15 +8,13 @@ import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import MockedObject from 'Core/MockedObject';
 import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
 import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
-import SanitizerService from 'Core/Generator/Sanitizer/SanitizerService';
 
 describe('Interactor', function (): void {
     let interactor: Interactor,
         statementGenerator: Spy<ContainerClassGenerator>,
         objectGenerator: Spy<ContainerObjectGenerator>,
         importGenerator: Spy<ImportGenerator>,
-        fileExtractor: Spy<FileExtractor>,
-        sanitizerService: Spy<SanitizerService>
+        fileExtractor: Spy<FileExtractor>
     ;
 
     beforeEach(function (): void {
@@ -24,15 +22,13 @@ describe('Interactor', function (): void {
         objectGenerator = createSpyFromClass(ContainerObjectGenerator);
         importGenerator = createSpyFromClass(ImportGenerator);
         fileExtractor = createSpyFromClass(FileExtractor);
-        sanitizerService = createSpyFromClass(SanitizerService);
 
         interactor = new Interactor(
             new StringHelper(),
             statementGenerator,
             objectGenerator,
             importGenerator,
-            fileExtractor,
-            sanitizerService
+            fileExtractor
         );
     });
 
@@ -55,11 +51,6 @@ describe('Interactor', function (): void {
             'test::targetFile:',
             'test::ignoreList:',
             []
-        );
-        expect(sanitizerService.sanitizeDescriptor).toHaveBeenCalledWith(
-            'test::descriptor:',
-            'test::ignoreList:',
-            'test::basePath:'
         );
         expect(objectGenerator.generate).toHaveBeenCalledWith(['test::descriptor:']);
         expect(importGenerator.generate).toHaveBeenCalledWith(

@@ -8,7 +8,6 @@ import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import FileName from 'Core/File/FileName';
 import DescriptorEntity from 'Core/DescriptorEntity';
 import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
-import SanitizerService from 'Core/Generator/Sanitizer/SanitizerService';
 import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
 
 export default class Interactor {
@@ -17,8 +16,7 @@ export default class Interactor {
         private statementGenerator: ContainerClassGenerator,
         private objectGenerator: ContainerObjectGenerator,
         private importGenerator: ImportGenerator,
-        private fileExtractor: FileExtractor,
-        private sanitizerService: SanitizerService
+        private fileExtractor: FileExtractor
     ) {
     }
 
@@ -29,13 +27,6 @@ export default class Interactor {
             request.mainFile,
             request.ignoreList,
             failedDescriptors
-        );
-        descriptors.forEach(
-            (descriptor: DescriptorEntity): void => this.sanitizerService.sanitizeDescriptor(
-                descriptor,
-                request.ignoreList,
-                request.basePath
-            )
         );
 
         console.log('Failed:', failedDescriptors);

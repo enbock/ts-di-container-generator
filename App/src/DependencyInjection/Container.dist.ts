@@ -62,9 +62,9 @@ class Container {
         this.objectGenerator,
         this.importGenerator,
         new FileExtractor(
-            this.fileClient
-        ),
-        this.pathSanitizer
+            this.fileClient,
+            this.pathSanitizer
+        )
     );
     private readonly presenter: Presenter = new Presenter(
         this.stringHelper,

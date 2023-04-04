@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ESNext",
-    "module": "NodeNext",
+    "target": "ES2022",
+    "module": "CommonJS",
     "importHelpers": true,
     "experimentalDecorators": true,
     "allowJs": true,
@@ -11,17 +11,14 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "NodeNext",
+    "moduleResolution": "Node",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "noImplicitAny": true,
     "outDir": "./build",
     "lib": [
-      "esnext",
-      "scripthost",
-      "es2015",
-      "dom"
+      "scripthost"
     ],
     "types": [
       "node",
@@ -53,7 +50,7 @@
   ],
   "ts-node": {
     "require": [
-      "./node_modules/tsconfig-paths/register"
+      "tsconfig-paths/register"
     ]
   }
 }

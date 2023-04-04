@@ -2,10 +2,10 @@ import TypeScript from './TypeScript';
 import Parser from './Parser/Parser';
 import fs from 'fs';
 import {Node} from 'typescript';
-import MockedObject from 'Core/src/MockedObject';
+import MockedObject from 'Core/MockedObject';
 import {createSpyFromClass, Spy} from 'jasmine-auto-spies';
 import ClassParser from './Parser/ClassParser';
-import DescriptorEntity, {ImportEntity} from 'Core/src/DescriptorEntity';
+import DescriptorEntity, {ImportEntity} from 'Core/DescriptorEntity';
 import path from 'path';
 
 describe('TypeScript', function (): void {

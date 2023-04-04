@@ -1,9 +1,7 @@
-#!/usr/bin/env ts-node
-
 import path from 'path';
 import FileName from 'Core/File/FileName';
 import DependencyInjectionContainer from './DependencyInjection/Container.dist';
-import Controller from 'App/Controller/Controller';
+import Controller from './Controller/Controller';
 
 const RootDependency: Controller = DependencyInjectionContainer.controller;
 

@@ -78,7 +78,8 @@ export default class DescriptorEntity {
     public provides: Array<InterfaceEntity | ClassEntity> = [];
 
     constructor(
-        public file: FileName
+        public file: FileName,
+        public basePath: string = ''
     ) {
     }
 
@@ -89,6 +90,7 @@ export default class DescriptorEntity {
         });
         return '[Descriptor:' +
             '\n  File:' + this.file +
+            '\n  Base:' + this.basePath +
             '\n  Imports:\n    ' + this.imports.join(',\n    ') +
             '\n  Requires:\n    ' + requires.join(',\n    ') +
             '\n  Provides:\n    ' + this.provides.join(', ')
