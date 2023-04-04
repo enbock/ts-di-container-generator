@@ -1,6 +1,6 @@
 {
   "name": "@enbock/ts-di-container-generator",
-  "version": "0.1.0-dev16",
+  "version": "0.1.0-dev17",
   "license": "MIT",
   "author": "Endre Bock <endre@itbock.de>",
   "publishConfig": {
@@ -22,7 +22,7 @@
     "@types/node": "^18",
     "jasmine": "^4",
     "jasmine-auto-spies": "^7",
-    "tsconfig-paths": "^4.2.0"
+    "tsconfig-paths": "^4"
   },
   "workspaces": [
     "App",

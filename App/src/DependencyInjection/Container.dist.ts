@@ -1,41 +1,41 @@
-import Generator from '../Generator';
 import StringHelper from 'Core/StringHelper';
-import InjectionExtractor from 'Core/InjectionExtractor/InjectionExtractor';
+import TypeScript from 'Infrastructure/File/TypeScript';
 import Controller from '../Controller/Controller';
-import ClassParser from 'Core/InjectionExtractor/Task/ClassParser';
-import ImportParser from 'Core/InjectionExtractor/Task/ImportParser';
-import InterfaceParser from 'Core/InjectionExtractor/Task/InterfaceParser';
-import ContainerClassGenerator from 'Core/Generator/ContainerClassGenerator';
-import ContainerObjectGenerator from 'Core/Generator/ContainerObjectGenerator';
+import ClassParser from 'Infrastructure/File/Parser/ClassParser';
+import ImportParser from 'Infrastructure/File/Parser/ImportParser';
+import InterfaceParser from 'Infrastructure/File/Parser/InterfaceParser';
+import ContainerClassGenerator from 'Core/Generator/Interactor/Task/ContainerClassGenerator';
+import ContainerObjectGenerator from 'Core/Generator/Interactor/Task/ContainerObjectGenerator';
 import fs from 'fs';
-import ParsingTask from 'Core/InjectionExtractor/Task/ParsingTask';
-import Sanitizer from 'Core/Generator/Sanitizer/Sanitizer';
-import RootDependencyParser from 'Core/InjectionExtractor/Task/RootDependencyParser';
+import Parser from 'Infrastructure/File/Parser/Parser';
+import SanitizerService from 'Core/Generator/Sanitizer/SanitizerService';
+import RootDependencyParser from 'Infrastructure/File/Parser/RootDependencyParser';
 import path from 'path';
 import GlobalImportRemover from 'Core/Generator/Sanitizer/Task/GlobalImportRemover';
-import PathResolver from 'Core/Generator/Sanitizer/Task/PathResolver';
 import IgnoredFileRemover from 'Core/Generator/Sanitizer/Task/IgnoredFileRemover';
 import RequirementResolver from 'Core/Generator/Sanitizer/Task/RequirementResolver';
 import ImportCleaner from 'Core/Generator/Sanitizer/Task/ImportCleaner';
 import NameGlobalizer from 'Core/Generator/Sanitizer/Task/NameGlobalizer';
-import ImportGenerator from 'Core/Generator/ImportGenerator';
+import ImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
 import Presenter from '../Controller/Presenter';
 import GeneratorInteractor from 'Core/Generator/Interactor/Interactor';
+import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
 
 class Container {
     private readonly stringHelper: StringHelper = new StringHelper();
-    private readonly classParser: ParsingTask = new ClassParser();
-    private readonly importParser: ParsingTask = new ImportParser();
-    private readonly interfaceParser: ParsingTask = new InterfaceParser();
-    private readonly rootDependencyParser: ParsingTask = new RootDependencyParser();
-    private readonly injectionExtractor: InjectionExtractor = new InjectionExtractor(
+    private readonly classParser: Parser = new ClassParser();
+    private readonly importParser: Parser = new ImportParser();
+    private readonly interfaceParser: Parser = new InterfaceParser();
+    private readonly rootDependencyParser: Parser = new RootDependencyParser();
+    private readonly fileClient: TypeScript = new TypeScript(
         [
             this.classParser,
             this.importParser,
             this.interfaceParser,
             this.rootDependencyParser
         ],
-        path.resolve
+        path.resolve,
+        path.dirname
     );
     private readonly containerClassGenerator: ContainerClassGenerator = new ContainerClassGenerator();
     private readonly objectGenerator: ContainerObjectGenerator = new ContainerObjectGenerator(
@@ -44,25 +44,9 @@ class Container {
     private readonly importGenerator: ImportGenerator = new ImportGenerator(
         path.dirname
     );
-    private readonly generatorInteractor: GeneratorInteractor = new GeneratorInteractor(
-        this.stringHelper,
-        this.containerClassGenerator,
-        this.objectGenerator,
-        this.importGenerator
-    );
-    private readonly controller: Controller = new Controller(
-        this.generatorInteractor,
-        new Presenter(
-            this.stringHelper,
-            fs.promises.writeFile
-        )
-    );
-    private readonly pathSanitizer: Sanitizer = new Sanitizer(
+    private readonly pathSanitizer: SanitizerService = new SanitizerService(
         new GlobalImportRemover(),
-        new PathResolver(
-            path.dirname,
-            path.resolve
-        ),
+        this.fileClient,
         new IgnoredFileRemover(),
         new RequirementResolver(),
         new ImportCleaner(),
@@ -71,11 +55,24 @@ class Container {
             this.stringHelper
         )
     );
-    public generator: Generator = new Generator(
+    private readonly generatorInteractor: GeneratorInteractor = new GeneratorInteractor(
         this.stringHelper,
-        this.injectionExtractor,
-        this.controller,
+        this.containerClassGenerator,
+        this.objectGenerator,
+        this.importGenerator,
+        new FileExtractor(
+            this.fileClient
+        ),
         this.pathSanitizer
+    );
+    private readonly presenter: Presenter = new Presenter(
+        this.stringHelper,
+        fs.promises.writeFile,
+        path.resolve
+    );
+    public readonly controller: Controller = new Controller(
+        this.generatorInteractor,
+        this.presenter
     );
 }
 

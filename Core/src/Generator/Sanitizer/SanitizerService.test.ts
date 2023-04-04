@@ -1,17 +1,19 @@
-import Sanitizer from './Sanitizer';
+import SanitizerService from './SanitizerService';
 import GlobalImportRemover from './Task/GlobalImportRemover';
 import {createSpyFromClass, Spy} from 'jasmine-auto-spies';
-import PathResolver from './Task/PathResolver';
 import IgnoredFileRemover from './Task/IgnoredFileRemover';
 import RequirementResolver from './Task/RequirementResolver';
 import ImportCleaner from './Task/ImportCleaner';
 import MockedObject from '../../MockedObject';
 import NameGlobalizer from './Task/NameGlobalizer';
+import FileClient from 'Core/File/FileClient';
+import FileName from 'Core/File/FileName';
+import DescriptorEntity from 'Core/DescriptorEntity';
 
-describe('Sanitizer', function (): void {
-    let sanitizer: Sanitizer,
+describe('SanitizerService', function (): void {
+    let sanitizer: SanitizerService,
         globalImportRemover: Spy<GlobalImportRemover>,
-        pathResolver: Spy<PathResolver>,
+        fileClient: Spy<FileClient>,
         ignoredFileRemover: Spy<IgnoredFileRemover>,
         requirementResolver: Spy<RequirementResolver>,
         importCleaner: Spy<ImportCleaner>,
@@ -20,15 +22,24 @@ describe('Sanitizer', function (): void {
 
     beforeEach(function (): void {
         globalImportRemover = createSpyFromClass(GlobalImportRemover);
-        pathResolver = createSpyFromClass(PathResolver);
+        fileClient = createSpyFromClass(
+            class implements FileClient {
+                public extract(basePath: string, file: FileName): DescriptorEntity {
+                    return new DescriptorEntity('');
+                }
+
+                public makeImportPathsAbsolute(descriptor: DescriptorEntity): void {
+                }
+            }
+        );
         ignoredFileRemover = createSpyFromClass(IgnoredFileRemover);
         requirementResolver = createSpyFromClass(RequirementResolver);
         importCleaner = createSpyFromClass(ImportCleaner);
         nameGlobalizer = createSpyFromClass(NameGlobalizer);
 
-        sanitizer = new Sanitizer(
+        sanitizer = new SanitizerService(
             globalImportRemover,
-            pathResolver,
+            fileClient,
             ignoredFileRemover,
             requirementResolver,
             importCleaner,
@@ -44,7 +55,7 @@ describe('Sanitizer', function (): void {
         );
 
         expect(globalImportRemover.removeGlobals).toHaveBeenCalledWith('test::descriptor:');
-        expect(pathResolver.makeImportPathsAbsolute).toHaveBeenCalledWith('test::descriptor:');
+        expect(fileClient.makeImportPathsAbsolute).toHaveBeenCalledWith('test::descriptor:');
         expect(ignoredFileRemover.removeIgnoredFiles).toHaveBeenCalledWith('test::descriptor:', 'test::ignoreList:');
         expect(requirementResolver.revolveRequiredImports).toHaveBeenCalledWith('test::descriptor:');
         expect(importCleaner.removeUnneededImports).toHaveBeenCalledWith('test::descriptor:');

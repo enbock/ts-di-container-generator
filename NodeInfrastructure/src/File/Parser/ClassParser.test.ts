@@ -42,7 +42,7 @@ describe('ClassParser', function (): void {
             parser.parse(node, result);
         });
         expect(result.provides).toEqual([new ClassEntity('TestClass')]);
-        const otherObjectRequirement: RequirementEntity = new RequirementEntity('otherObject', false, 'OtherClass');
+        const otherObjectRequirement: RequirementEntity = new RequirementEntity('otherObject', 'OtherClass', false);
         const nativeValueRequirement: RequirementEntity = new RequirementEntity('nativeValue');
         const expectedRequirements: Map<AliasName, RequirementEntity[]> = new Map<AliasName, RequirementEntity[]>(
             [

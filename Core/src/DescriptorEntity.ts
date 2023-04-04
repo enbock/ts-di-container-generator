@@ -1,4 +1,4 @@
-import FileName from './FileName';
+import FileName from './File/FileName';
 
 export type AliasName = string;
 
@@ -50,8 +50,8 @@ export class RequirementEntity {
 
     constructor(
         public parameter: string,
-        public isLinked: boolean = false,
-        public type: AliasName = ''
+        public type: AliasName = '',
+        public isLinked: boolean = false
     ) {
     }
 

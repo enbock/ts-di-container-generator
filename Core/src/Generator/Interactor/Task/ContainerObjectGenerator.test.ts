@@ -1,5 +1,5 @@
 import ContainerObjectGenerator from './ContainerObjectGenerator';
-import StringHelper from '../StringHelper';
+import StringHelper from '../../../StringHelper';
 import TypeScript, {
     ClassDeclaration,
     ClassElement,
@@ -11,7 +11,7 @@ import TypeScript, {
     Statement,
     SyntaxKind
 } from 'typescript';
-import DescriptorEntity, {AliasName, InterfaceEntity, RequirementEntity, Type} from '../DescriptorEntity';
+import DescriptorEntity, {AliasName, InterfaceEntity, RequirementEntity, Type} from '../../../DescriptorEntity';
 
 describe('ContainerObjectGenerator', function () {
     let generator: ContainerObjectGenerator;
@@ -40,8 +40,8 @@ describe('ContainerObjectGenerator', function () {
 
     it('should generates an property for a class', async function (): Promise<void> {
         const descriptor: DescriptorEntity = new DescriptorEntity('test::file:');
-        const objectRequirement: RequirementEntity = new RequirementEntity('injectedClass', false, 'OtherClass');
-        const nativeTypeRequirement: RequirementEntity = new RequirementEntity('nativeValue', false);
+        const objectRequirement: RequirementEntity = new RequirementEntity('injectedClass', 'OtherClass', false);
+        const nativeTypeRequirement: RequirementEntity = new RequirementEntity('nativeValue', '', false);
         descriptor.requires = new Map<AliasName, RequirementEntity[]>(
             [
                 [

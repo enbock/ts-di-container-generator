@@ -7,11 +7,11 @@ import TypeScript, {
     Node,
     SyntaxKind
 } from 'typescript';
-import ParsingTask from './ParsingTask';
-import FileName from 'Core/FileName';
+import Parser from './Parser';
+import FileName from 'Core/File/FileName';
 import DescriptorEntity, {AliasEntity, ImportEntity} from 'Core/DescriptorEntity';
 
-export default class ImportParser implements ParsingTask {
+export default class ImportParser implements Parser {
     public parse(node: Node, result: DescriptorEntity): void {
         if (TypeScript.isImportDeclaration(node) == false) return;
 

@@ -1,5 +1,5 @@
 import DescriptorEntity, {ImportEntity} from '../../../DescriptorEntity';
-import FileName from '../../../FileName';
+import FileName from '../../../File/FileName';
 
 export default class IgnoredFileRemover {
     public removeIgnoredFiles(descriptor: DescriptorEntity, ignoreList: Array<FileName>): void {

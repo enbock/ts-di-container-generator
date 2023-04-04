@@ -12,7 +12,7 @@ describe('RequirementResolver', function (): void {
         const descriptor: DescriptorEntity = new DescriptorEntity('test::basingPath:');
         const neededImport: ImportEntity = new ImportEntity('test::file:', new AliasEntity('test::alias:'));
         descriptor.imports = [neededImport];
-        const requirement: RequirementEntity = new RequirementEntity('test::name:', false, 'test::alias:');
+        const requirement: RequirementEntity = new RequirementEntity('test::name:', 'test::alias:', false);
         descriptor.requires.set('any', [requirement]);
 
         requirementResolver.revolveRequiredImports(descriptor);

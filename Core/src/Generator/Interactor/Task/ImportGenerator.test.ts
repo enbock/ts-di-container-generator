@@ -1,5 +1,5 @@
 import ImportGenerator from './ImportGenerator';
-import DescriptorEntity, {AliasEntity, ImportEntity} from '../DescriptorEntity';
+import DescriptorEntity, {AliasEntity, ImportEntity} from '../../../DescriptorEntity';
 import TypeScript, {
     EmitHint,
     ImportDeclaration,

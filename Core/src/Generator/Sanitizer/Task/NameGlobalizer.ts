@@ -1,5 +1,5 @@
 import DescriptorEntity, {RequirementEntity} from '../../../DescriptorEntity';
-import FileName from '../../../FileName';
+import FileName from '../../../File/FileName';
 import path from 'path';
 import StringHelper from '../../../StringHelper';
 

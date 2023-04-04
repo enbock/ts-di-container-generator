@@ -1,30 +1,38 @@
 import Interactor from './Interactor';
 import {createSpyFromClass, Spy} from 'jasmine-auto-spies';
-import ContainerClassGenerator from 'Core/Generator/ContainerClassGenerator';
-import ContainerObjectGenerator from 'Core/Generator/ContainerObjectGenerator';
-import ImportGenerator from 'Core/Generator/ImportGenerator';
+import ContainerClassGenerator from 'Core/Generator/Interactor/Task/ContainerClassGenerator';
+import ContainerObjectGenerator from 'Core/Generator/Interactor/Task/ContainerObjectGenerator';
+import ImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
 import StringHelper from 'Core/StringHelper';
 import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import MockedObject from 'Core/MockedObject';
 import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
+import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
+import SanitizerService from 'Core/Generator/Sanitizer/SanitizerService';
 
 describe('Interactor', function (): void {
     let interactor: Interactor,
         statementGenerator: Spy<ContainerClassGenerator>,
         objectGenerator: Spy<ContainerObjectGenerator>,
-        importGenerator: Spy<ImportGenerator>
+        importGenerator: Spy<ImportGenerator>,
+        fileExtractor: Spy<FileExtractor>,
+        sanitizerService: Spy<SanitizerService>
     ;
 
     beforeEach(function (): void {
         statementGenerator = createSpyFromClass(ContainerObjectGenerator);
         objectGenerator = createSpyFromClass(ContainerObjectGenerator);
         importGenerator = createSpyFromClass(ImportGenerator);
+        fileExtractor = createSpyFromClass(FileExtractor);
+        sanitizerService = createSpyFromClass(SanitizerService);
 
         interactor = new Interactor(
             new StringHelper(),
             statementGenerator,
             objectGenerator,
-            importGenerator
+            importGenerator,
+            fileExtractor,
+            sanitizerService
         );
     });
 
@@ -32,18 +40,30 @@ describe('Interactor', function (): void {
         objectGenerator.generate.and.returnValue(['test::objectMembers:']);
         importGenerator.generate.and.returnValue(['test::importStatements:']);
         statementGenerator.generate.and.returnValue(['test::objectStatements']);
+        fileExtractor.extract.and.returnValue(['test::descriptor:' as MockedObject]);
 
         const response: GenerateResponse = {statements: []};
         const request: GenerateRequest = {
-            targetFile: 'test::targetFile:',
+            mainFile: 'test::targetFile:',
             basePath: 'test::basePath:',
-            descriptors: 'test::descriptors:' as MockedObject
+            ignoreList: 'test::ignoreList:' as MockedObject
         };
-        interactor.generate(request, response);
+        interactor.loadAndGenerate(request, response);
 
-        expect(objectGenerator.generate).toHaveBeenCalledWith('test::descriptors:');
+        expect(fileExtractor.extract).toHaveBeenCalledWith(
+            'test::basePath:',
+            'test::targetFile:',
+            'test::ignoreList:',
+            []
+        );
+        expect(sanitizerService.sanitizeDescriptor).toHaveBeenCalledWith(
+            'test::descriptor:',
+            'test::ignoreList:',
+            'test::basePath:'
+        );
+        expect(objectGenerator.generate).toHaveBeenCalledWith(['test::descriptor:']);
         expect(importGenerator.generate).toHaveBeenCalledWith(
-            'test::descriptors:',
+            ['test::descriptor:'],
             'test::basePath:',
             'test::targetFile:'
         );

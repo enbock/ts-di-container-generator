@@ -24,19 +24,23 @@ describe('Controller', function (): void {
 
     it('should generate TypeScript file', function (): void {
         let generateResponse: GenerateResponse = new GenerateResponse();
-        generatorInteractor.generate.and.callFake(
+        generatorInteractor.loadAndGenerate.and.callFake(
             function (request: GenerateRequest, response: GenerateResponse): void {
                 generateResponse = response;
                 generateResponse.statements = 'test::statements:' as MockedObject;
                 expect(request.basePath).toBe('test::basePath:');
-                expect(request.descriptors).toBe('test::descriptors:' as MockedObject);
-                expect(request.targetFile).toBe('test::targetFile:');
+                expect(request.mainFile).toBe('test::mainFile:');
+                expect(request.ignoreList).toBe('test::ignoreList:');
             }
         );
 
-        fileGenerator.generate('test::descriptors:' as MockedObject, 'test::basePath:', 'test::targetFile:');
+        fileGenerator.generate(
+            'test::basePath:',
+            'test::mainFile:',
+            'test::ignoreList:' as MockedObject
+        );
 
-        expect(generatorInteractor.generate).toHaveBeenCalled();
-        expect(presenter.present).toHaveBeenCalledWith(generateResponse, 'test::targetFile:');
+        expect(generatorInteractor.loadAndGenerate).toHaveBeenCalled();
+        expect(presenter.present).toHaveBeenCalledWith(generateResponse, 'test::basePath:');
     });
 });

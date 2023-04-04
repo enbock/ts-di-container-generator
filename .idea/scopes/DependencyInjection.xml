@@ -1,3 +1,3 @@
 <component name="DependencyValidationManager">
-  <scope name="DependencyInjection" pattern="file[App]:src/DependencyInjection/*||file[App]:src/DependencyInjection//*" />
+  <scope name="DependencyInjection" pattern="file[ts-di-container-generator]:App/src/DependencyInjection//*||file[ts-di-container-generator]:App/src/DependencyInjection/*" />
 </component>

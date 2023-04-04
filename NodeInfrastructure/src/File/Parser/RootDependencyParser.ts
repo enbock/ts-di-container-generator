@@ -1,4 +1,4 @@
-import ParsingTask from './ParsingTask';
+import Parser from './Parser';
 import DescriptorEntity, {RequirementEntity} from 'Core/DescriptorEntity';
 import TypeScript, {
     Identifier,
@@ -9,7 +9,7 @@ import TypeScript, {
     VariableStatement
 } from 'typescript';
 
-export default class RootDependencyParser implements ParsingTask {
+export default class RootDependencyParser implements Parser {
     public parse(node: Node, result: DescriptorEntity): void {
         if (TypeScript.isVariableStatement(node) == false) return;
         const declarations: NodeArray<VariableDeclaration> = (node as VariableStatement).declarationList.declarations;
@@ -23,7 +23,7 @@ export default class RootDependencyParser implements ParsingTask {
             ((rootDependency.type as TypeReferenceNode | undefined)?.typeName as Identifier).escapedText || '';
 
         const globalRequire: Array<RequirementEntity> = result.requires.get('') || [];
-        globalRequire.push(new RequirementEntity('', false, requiredClass));
+        globalRequire.push(new RequirementEntity('', requiredClass, false));
         result.requires.set('', globalRequire);
     }
 }

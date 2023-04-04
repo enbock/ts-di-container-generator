@@ -1,4 +1,4 @@
-import DescriptorEntity, {ImportEntity} from '../DescriptorEntity';
+import DescriptorEntity, {ImportEntity} from '../../../DescriptorEntity';
 import TypeScript, {ImportDeclaration} from 'typescript';
 import path from 'path';
 

@@ -1,8 +1,8 @@
-import ParsingTask from './ParsingTask';
+import Parser from './Parser';
 import TypeScript, {ClassDeclaration, ConstructorDeclaration, Identifier, Node, ParameterDeclaration} from 'typescript';
 import DescriptorEntity, {ClassEntity, RequirementEntity} from 'Core/DescriptorEntity';
 
-export default class ClassParser implements ParsingTask {
+export default class ClassParser implements Parser {
     public parse(node: Node, result: DescriptorEntity): void {
         if (TypeScript.isClassDeclaration(node) == false) return;
 

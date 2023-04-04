@@ -1,8 +1,7 @@
-import DescriptorEntity from 'Core/DescriptorEntity';
-import FileName from 'Core/FileName';
+import FileName from 'Core/File/FileName';
 
 export default interface GenerateRequest {
-    descriptors: DescriptorEntity[];
+    ignoreList: Array<FileName>;
     basePath: string;
-    targetFile: FileName;
+    mainFile: FileName;
 }

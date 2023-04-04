@@ -2,7 +2,8 @@
   "spec_dir": ".",
   "spec_files": [
     "App/src/**/*.test.ts",
-    "Core/src/**/*.test.ts"
+    "Core/src/**/*.test.ts",
+    "NodeInfrastructure/src/**/*.test.ts"
   ],
   "helpers": [
   ],

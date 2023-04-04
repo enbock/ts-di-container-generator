@@ -2,9 +2,8 @@
   "compilerOptions": {
     "target": "ESNext",
     "module": "NodeNext",
-    "lib": [
-      "esnext"
-    ],
+    "importHelpers": true,
+    "experimentalDecorators": true,
     "allowJs": true,
     "skipLibCheck": true,
     "esModuleInterop": true,
@@ -12,12 +11,25 @@
     "strict": true,
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
-    "moduleResolution": "node",
+    "moduleResolution": "NodeNext",
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
     "noImplicitAny": true,
     "outDir": "./build",
+    "lib": [
+      "esnext",
+      "scripthost",
+      "es2015",
+      "dom"
+    ],
+    "types": [
+      "node",
+      "jasmine"
+    ],
+    "typeRoots": [
+      "node_modules/@types"
+    ],
     "baseUrl": ".",
     "paths": {
       "App/*": [
@@ -34,7 +46,10 @@
   "include": [
     "App/src/**/*",
     "Core/src/**/*",
-    "Infrastructure/src/**/*"
+    "NodeInfrastructure/src/**/*"
+  ],
+  "exclude": [
+    "node_modules"
   ],
   "ts-node": {
     "require": [

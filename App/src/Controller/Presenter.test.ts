@@ -3,19 +3,23 @@ import fs from 'fs';
 import StringHelper from 'Core/StringHelper';
 import TypeScript, {ClassElement} from 'typescript';
 import GenerateResponse from './GenerateResponse';
-import MockedObject from '../MockedObject';
+import MockedObject from 'Core/MockedObject';
+import path from 'path';
 import Spy = jasmine.Spy;
 
 describe('Presenter', function (): void {
     let presenter: Presenter,
-        writeFile: Spy<typeof fs.promises.writeFile>
+        writeFile: Spy<typeof fs.promises.writeFile>,
+        resolve: Spy<typeof path.resolve>
     ;
-    
+
     beforeEach(function (): void {
         writeFile = jasmine.createSpy();
+        resolve = jasmine.createSpy();
         presenter = new Presenter(
             new StringHelper(),
-            writeFile
+            writeFile,
+            resolve
         );
     });
 
@@ -32,11 +36,14 @@ describe('Presenter', function (): void {
     }
 
     it('should generate TypeScript file', function (): void {
-        const generateResponse: GenerateResponse = new GenerateResponse(createTestProperty() as MockedObject);
-        presenter.present(generateResponse, 'test::targetFile:');
+        resolve.and.returnValue('test::targetFile:');
 
+        const generateResponse: GenerateResponse = new GenerateResponse(createTestProperty() as MockedObject);
+        presenter.present(generateResponse, 'test::basePath:');
+
+        expect(resolve).toHaveBeenCalledWith('test::basePath:', './DependencyInjection/Container');
         expect(writeFile).toHaveBeenCalledWith(
-            'test::targetFile:',
+            'test::targetFile:.ts',
             `// @formatter:off
 testProperty;
 `,

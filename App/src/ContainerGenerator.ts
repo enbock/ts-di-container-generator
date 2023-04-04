@@ -1,11 +1,11 @@
 #!/usr/bin/env ts-node
 
 import path from 'path';
-import FileName from 'Core/FileName';
-import Generator from './Generator';
+import FileName from 'Core/File/FileName';
 import DependencyInjectionContainer from './DependencyInjection/Container.dist';
+import Controller from 'App/Controller/Controller';
 
-const RootDependency: Generator = DependencyInjectionContainer.generator;
+const RootDependency: Controller = DependencyInjectionContainer.controller;
 
 async function main(source: string, mainFile: FileName, ignoreList: Array<FileName>): Promise<void> {
     const basePath: string = path.resolve(process.cwd(), source);

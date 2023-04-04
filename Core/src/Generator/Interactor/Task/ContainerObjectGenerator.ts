@@ -1,4 +1,4 @@
-import StringHelper from '../StringHelper';
+import StringHelper from '../../../StringHelper';
 import TypeScript, {
     ClassElement,
     Expression,
@@ -8,7 +8,7 @@ import TypeScript, {
     PropertyDeclaration,
     SyntaxKind
 } from 'typescript';
-import DescriptorEntity, {ClassEntity, InterfaceEntity, RequirementEntity, Type} from '../DescriptorEntity';
+import DescriptorEntity, {ClassEntity, InterfaceEntity, RequirementEntity, Type} from '../../../DescriptorEntity';
 
 export default class ContainerObjectGenerator {
     constructor(
