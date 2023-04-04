@@ -35,7 +35,8 @@ class Container {
             this.rootDependencyParser
         ],
         path.resolve,
-        path.dirname
+        path.dirname,
+        fs.existsSync
     );
     private readonly containerClassGenerator: ContainerClassGenerator = new ContainerClassGenerator();
     private readonly objectGenerator: ContainerObjectGenerator = new ContainerObjectGenerator(
