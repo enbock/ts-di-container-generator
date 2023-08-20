@@ -82,9 +82,11 @@ describe('FileExtractor', function (): void {
         requirement.import = descriptor1.imports[0];
         descriptor1.requires.set('test::file1Requirements', [requirement]);
         descriptor2.imports = [];
+        const config: ConfigEntity = new ConfigEntity();
+        config.basePath = 'test::path';
 
-        fileClient.extract.withArgs('test::basePath', 'test::file').and.returnValue(descriptor1);
-        fileClient.extract.withArgs('test::basePath', 'test::file2').and.returnValue(descriptor2);
+        fileClient.extract.withArgs('test::basePath', 'test::file', config).and.returnValue(descriptor1);
+        fileClient.extract.withArgs('test::basePath', 'test::file2', config).and.returnValue(descriptor2);
 
         const ignoreList: Array<FileName> = ['test::ignore'];
         const failedDescriptors: Array<FailedDescriptorEntity> = [];
@@ -92,8 +94,9 @@ describe('FileExtractor', function (): void {
 
         fileExtractor.extract(
             'test::file',
-            new ParameterBag('test::basePath', ignoreList, failedDescriptors, descriptors, new ConfigEntity())
+            new ParameterBag('test::basePath', ignoreList, failedDescriptors, descriptors, config)
         );
+
         expect(descriptors.length).toBe(1);
         expect(descriptors[0]).toBe(descriptor1);
     });

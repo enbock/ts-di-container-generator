@@ -2,59 +2,78 @@ import Parser from './Parser';
 import {Spy} from 'jasmine-auto-spies';
 import mock from 'Core/mock';
 import ParseHelper from 'Infrastructure/ParseHelper';
-import ConfigEntity, {PathAlias} from 'Core/Configuration/ConfigEntity';
+import ConfigEntity from 'Core/Configuration/ConfigEntity';
 import MockedObject from 'Core/MockedObject';
+import createSpy = jasmine.createSpy;
 
 describe('Parser', function (): void {
     let parser: Parser,
-        parseHelper: Spy<ParseHelper>
+        parseHelper: Spy<ParseHelper>,
+        resolve: jasmine.Spy
     ;
 
     beforeEach(function (): void {
         parseHelper = mock<ParseHelper>();
+        resolve = createSpy();
 
         parser = new Parser(
-            parseHelper
+            parseHelper,
+            resolve
         );
     });
-    it('should parse config and return ConfigEntity', async function (): Promise<void> {
+
+    it('should parse ConfigEntity from data with one valid target path', async function (): Promise<void> {
         const data: MockedObject = {
             compilerOptions: {
                 paths: {
-                    'test::key': ['test::path']
-                }
+                    'test::key/*': ['test::path/*']
+                },
+                baseUrl: 'test::baseUrl'
             }
         };
-        const configEntity: ConfigEntity = new ConfigEntity();
-        const pathAlias: PathAlias = new PathAlias();
-        pathAlias.regExp = new RegExp('^test::key');
-        pathAlias.targetPath = 'test::path';
-        configEntity.pathAliases = [pathAlias];
 
-        parseHelper.get.and.returnValue(data.compilerOptions.paths);
+        parseHelper.get.withArgs(data, 'compilerOptions.baseUrl', '.')
+            .and
+            .returnValue(data.compilerOptions.baseUrl);
+        parseHelper.get.withArgs(data, 'compilerOptions.paths', []).and.returnValue(data.compilerOptions.paths);
 
-        const result: ConfigEntity = await parser.parseConfig(data);
+        resolve.and.callFake(function (path1: string, path2: string): string {
+            return path1 + '/' + path2;
+        });
+
+        const result: ConfigEntity = await parser.parseConfig(data, 'test::basePath');
 
         expect(parseHelper.get).toHaveBeenCalledWith(data, 'compilerOptions.paths', []);
-        expect(result).toEqual(configEntity);
+        expect(resolve).toHaveBeenCalledWith('test::basePath', 'test::baseUrl');
+        expect(result.pathAliases[0].regExp).toEqual(new RegExp('^test::key/'));
+        expect(result.pathAliases[0].targetPath).toBe('test::path/');
+        expect(result.pathAliases[0].name).toBe('test::key/');
+        expect(result.basePath).toBe('test::basePath/test::baseUrl');
     });
 
-    it('should parse config and ignore keys with empty target path', async function (): Promise<void> {
-        const data: MockedObject = {
-            compilerOptions: {
-                paths: {
-                    'test::key': []
+    it(
+        'should parse and ignore keys with empty target path when no target path in data',
+        async function (): Promise<void> {
+            const data: MockedObject = {
+                compilerOptions: {
+                    paths: {
+                        'test::key/*': []
+                    }
                 }
-            }
-        };
-        const configEntity: ConfigEntity = new ConfigEntity();
-        configEntity.pathAliases = [];
+            };
 
-        parseHelper.get.and.returnValue(data.compilerOptions.paths);
+            parseHelper.get.withArgs(data, 'compilerOptions.baseUrl', '.').and.returnValue(undefined);
+            parseHelper.get.withArgs(data, 'compilerOptions.paths', []).and.returnValue(data.compilerOptions.paths);
 
-        const result: ConfigEntity = await parser.parseConfig(data);
+            resolve.and.callFake(function (path1: string, path2: string): string {
+                return path1 + '/' + path2;
+            });
 
-        expect(parseHelper.get).toHaveBeenCalledWith(data, 'compilerOptions.paths', []);
-        expect(result).toEqual(configEntity);
-    });
+            const result: ConfigEntity = await parser.parseConfig(data, 'test::basePath');
+
+            expect(parseHelper.get).toHaveBeenCalledWith(data, 'compilerOptions.paths', []);
+            expect(result.pathAliases).toEqual([]);
+            expect(result.basePath).toBe('test::basePath/.');
+        }
+    );
 });

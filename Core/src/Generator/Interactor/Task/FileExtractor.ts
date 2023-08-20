@@ -29,7 +29,7 @@ export default class FileExtractor {
         parameters: ParameterBag
     ): void {
         try {
-            const descriptor: DescriptorEntity = this.fileClient.extract(parameters.basePath, file);
+            const descriptor: DescriptorEntity = this.fileClient.extract(parameters.basePath, file, parameters.config);
             this.sanitizerService.sanitizeDescriptor(
                 descriptor,
                 parameters.ignoreList,

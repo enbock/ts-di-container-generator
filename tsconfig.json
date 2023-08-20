@@ -25,6 +25,7 @@
       "jasmine"
     ],
     "typeRoots": [
+      "./Core/src",
       "node_modules/@types"
     ],
     "baseUrl": ".",
@@ -41,6 +42,7 @@
     }
   },
   "include": [
+    "Core/src/global.d.ts",
     "App/src/**/*",
     "Core/src/**/*",
     "NodeInfrastructure/src/**/*"

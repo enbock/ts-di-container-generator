@@ -11,19 +11,17 @@ import TypeScript, {
     SyntaxKind
 } from 'typescript';
 import path from 'path';
-import Spy = jasmine.Spy;
+import ConfigEntity, {PathAlias} from 'Core/Configuration/ConfigEntity';
 
 describe('ImportGenerator', function (): void {
-    let importGenerator: ImportGenerator,
-        dirname: Spy<typeof path.dirname>
-    ;
+    let importGenerator: ImportGenerator;
     const printer: Printer = TypeScript.createPrinter({newLine: TypeScript.NewLineKind.LineFeed});
 
     beforeEach(function (): void {
-        dirname = jasmine.createSpy();
-
         importGenerator = new ImportGenerator(
-            dirname
+            path.resolve,
+            path.relative,
+            path.normalize
         );
     });
 
@@ -43,16 +41,35 @@ describe('ImportGenerator', function (): void {
             new ImportEntity('base\\path\\domain\\test::file:', new AliasEntity('test::alias:'))
         ];
 
-        dirname.and.returnValue('base\\path\\container');
-
         const result: Array<ImportDeclaration> = importGenerator.generate(
             [descriptor],
             'base\\path',
-            'test::targetFile:'
+            new ConfigEntity()
         );
         const code: string = generateCode(result);
 
-        expect(dirname).toHaveBeenCalledWith('test::targetFile:');
         expect(code).toContain('import test::alias: from \'../domain/test::file:\';');
+    });
+
+    it('should generate import statements for aliased imports', async function (): Promise<void> {
+        const descriptor: DescriptorEntity = new DescriptorEntity('');
+        descriptor.imports = [
+            new ImportEntity('root\\global\\path\\domain\\test::file:', new AliasEntity('test::alias:'))
+        ];
+
+        const alias: PathAlias = new PathAlias();
+        alias.targetPath = 'global/path/';
+        alias.name = 'global/';
+        const config: ConfigEntity = new ConfigEntity();
+        config.pathAliases = [alias];
+        config.basePath = 'root';
+        const result: Array<ImportDeclaration> = importGenerator.generate(
+            [descriptor],
+            'base\\path',
+            config
+        );
+        const code: string = generateCode(result);
+
+        expect(code).toContain('import test::alias: from \'global/domain/test::file:\';');
     });
 });

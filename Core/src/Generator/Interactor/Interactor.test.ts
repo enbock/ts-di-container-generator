@@ -72,7 +72,7 @@ describe('Interactor', function (): void {
         expect(importGenerator.generate).toHaveBeenCalledWith(
             [descriptor],
             'test::basePath:',
-            'test::targetFile:'
+            'test::config'
         );
         expect(statementGenerator.generate).toHaveBeenCalledWith(['test::objectMembers:']);
         expect(response.statements).toEqual(['test::importStatements:', 'test::objectStatements'] as MockedObject);

@@ -26,6 +26,7 @@ import ConfigTypeScript from 'Infrastructure/Config/TypeScript';
 import fsPromises from 'fs/promises';
 import ConfigParser from 'Infrastructure/Config/Parser';
 import ParseHelper from 'Infrastructure/ParseHelper';
+import * as process from 'process';
 
 class Container {
     private stringHelper: StringHelper = new StringHelper();
@@ -49,7 +50,9 @@ class Container {
         this.stringHelper
     );
     private importGenerator: ImportGenerator = new ImportGenerator(
-        path.dirname
+        path.resolve,
+        path.relative,
+        path.normalize
     );
     private pathSanitizer: SanitizerService = new SanitizerService(
         new GlobalImportRemover(),
@@ -59,7 +62,8 @@ class Container {
         new ImportCleaner(),
         new NameGlobalizer(
             path.dirname,
-            this.stringHelper
+            this.stringHelper,
+            path.normalize
         ),
         new FallbackRequireNameCreator(
             path.dirname,
@@ -88,7 +92,12 @@ class Container {
             new ConfigTypeScript(
                 fs.existsSync,
                 fsPromises.readFile,
-                new ConfigParser(this.parseHelper)
+                new ConfigParser(
+                    this.parseHelper,
+                    path.resolve
+                ),
+                process.cwd,
+                path.resolve
             )
         )
     );

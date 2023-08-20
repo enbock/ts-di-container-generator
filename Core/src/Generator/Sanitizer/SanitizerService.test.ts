@@ -49,12 +49,16 @@ describe('SanitizerService', function (): void {
             'test::config' as MockedObject
         );
 
-        expect(globalImportRemover.removeGlobals).toHaveBeenCalledWith('test::descriptor:');
-        expect(fileClient.makeImportPathsAbsolute).toHaveBeenCalledWith('test::descriptor:');
+        expect(globalImportRemover.removeGlobals).toHaveBeenCalledWith('test::descriptor:', 'test::config');
+        expect(fileClient.makeImportPathsAbsolute).toHaveBeenCalledWith('test::descriptor:', 'test::config');
         expect(ignoredFileRemover.removeIgnoredFiles).toHaveBeenCalledWith('test::descriptor:', 'test::ignoreList:');
         expect(requirementResolver.revolveRequiredImports).toHaveBeenCalledWith('test::descriptor:');
         expect(importCleaner.removeUnneededImports).toHaveBeenCalledWith('test::descriptor:');
-        expect(nameGlobalizer.makeClassesGlobalUnique).toHaveBeenCalledWith('test::descriptor:', 'test::basePath:');
+        expect(nameGlobalizer.makeClassesGlobalUnique).toHaveBeenCalledWith(
+            'test::descriptor:',
+            'test::basePath:',
+            'test::config'
+        );
         expect(fallbackRequireNameCreator.addRequireName).toHaveBeenCalledWith('test::descriptor:', 'test::basePath:');
     });
 });

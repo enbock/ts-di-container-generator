@@ -4,10 +4,10 @@ import ImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
 import ts, {ClassElement} from 'typescript';
 import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
 import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
-import FileName from 'Core/File/FileName';
 import DescriptorEntity, {ClassEntity, ImportEntity, InterfaceEntity, Type} from 'Core/DescriptorEntity';
 import FileExtractor, {ParameterBag} from 'Core/Generator/Interactor/Task/FileExtractor';
 import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
+import ConfigEntity from 'Core/Configuration/ConfigEntity';
 
 export default class Interactor {
     constructor(
@@ -36,7 +36,7 @@ export default class Interactor {
         console.log('Failed:', failedDescriptors);
         console.log('Loaded:', descriptors.join('\n'));
 
-        response.statements = this.generateStructure(request.basePath, request.mainFile, descriptors);
+        response.statements = this.generateStructure(request.basePath, descriptors, request.config);
     }
 
     private removeUnusedClasses(descriptors: Array<DescriptorEntity>): void {
@@ -62,12 +62,12 @@ export default class Interactor {
 
     private generateStructure(
         basePath: string,
-        targetFile: FileName,
-        descriptors: Array<DescriptorEntity>
+        descriptors: Array<DescriptorEntity>,
+        config: ConfigEntity
     ): Array<ts.Statement> {
         const members: ClassElement[] = this.objectGenerator.generate(descriptors);
         return [
-            ...this.importGenerator.generate(descriptors, basePath, targetFile),
+            ...this.importGenerator.generate(descriptors, basePath, config),
             ...this.statementGenerator.generate(members)
         ];
     }

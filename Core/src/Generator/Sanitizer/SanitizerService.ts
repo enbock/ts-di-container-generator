@@ -27,12 +27,12 @@ export default class SanitizerService {
         basePath: string,
         config: ConfigEntity
     ): void {
-        this.globalImportRemover.removeGlobals(descriptor);
-        this.fileClient.makeImportPathsAbsolute(descriptor);
+        this.globalImportRemover.removeGlobals(descriptor, config);
+        this.fileClient.makeImportPathsAbsolute(descriptor, config);
         this.ignoredFileRemover.removeIgnoredFiles(descriptor, ignoreList);
         this.requirementResolver.revolveRequiredImports(descriptor);
         this.importCleaner.removeUnneededImports(descriptor);
-        this.nameGlobalizer.makeClassesGlobalUnique(descriptor, basePath);
+        this.nameGlobalizer.makeClassesGlobalUnique(descriptor, basePath, config);
         this.fallbackRequireNameCreator.addRequireName(descriptor, basePath);
     }
 }

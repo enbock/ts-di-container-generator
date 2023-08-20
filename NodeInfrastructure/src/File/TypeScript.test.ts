@@ -7,6 +7,8 @@ import {createSpyFromClass, Spy} from 'jasmine-auto-spies';
 import ClassParser from './Parser/ClassParser';
 import DescriptorEntity, {ImportEntity} from 'Core/DescriptorEntity';
 import path from 'path';
+import ConfigEntity, {PathAlias} from 'Core/Configuration/ConfigEntity';
+import FileName from 'Core/File/FileName';
 
 describe('TypeScript', function (): void {
     let fileClient: TypeScript,
@@ -47,11 +49,34 @@ describe('TypeScript', function (): void {
         });
         fileExistsSync.and.returnValue(true);
 
-        const result: DescriptorEntity = fileClient.extract('test::dirname:', 'test::file:');
+        const result: DescriptorEntity = fileClient.extract('test::dirname:', 'test::file:', new ConfigEntity());
 
         expect(resolve).toHaveBeenCalledWith('test::dirname:', 'test::file:');
         expect(result.file).toBe('./TestFile');
         expect(result.provides).toBe('test::taskResult:' as MockedObject);
+    });
+
+    it('should load file by global path alias', function (): void {
+        const pathAlias: PathAlias = new PathAlias();
+        pathAlias.regExp = /test::alias\//;
+        pathAlias.targetPath = 'test::target/path/';
+        const config: ConfigEntity = new ConfigEntity();
+        config.pathAliases = [pathAlias];
+        config.basePath = 'test::globalBasePath';
+        fileExistsSync.and.returnValue(true);
+
+        const file: FileName = 'test::alias/test::FileName';
+        resolve
+            .withArgs('test::globalBasePath', 'test::target/path/test::FileName')
+            .and
+            .returnValue('./TestFile')
+        ;
+
+        const descriptor: DescriptorEntity = fileClient.extract('test::dirname:', file, config);
+
+        expect(fileExistsSync).toHaveBeenCalledWith('./TestFile.ts');
+        expect(descriptor).toBeInstanceOf(DescriptorEntity);
+        expect(descriptor.file).toBe('./TestFile');
     });
 
     it('should make the import paths absolute', async function (): Promise<void> {
@@ -60,10 +85,32 @@ describe('TypeScript', function (): void {
         const descriptor: DescriptorEntity = new DescriptorEntity('test::basingPath:');
         descriptor.imports = [new ImportEntity('test::file:')];
 
-        fileClient.makeImportPathsAbsolute(descriptor);
+        fileClient.makeImportPathsAbsolute(descriptor, new ConfigEntity());
 
         expect(dirname).toHaveBeenCalledWith('test::basingPath:');
         expect(resolve).toHaveBeenCalledWith('test::dirname:', 'test::file:');
+        expect(descriptor.imports[0].file).toBe('test::resolvedFile:');
+    });
+
+    it('should make the import paths absolute by using global imports', async function (): Promise<void> {
+        dirname.and.returnValue('test::dirname:');
+        resolve.withArgs('test::globalBasePath', 'test::target/path/test::file:')
+            .and
+            .returnValue('test::resolvedFile:');
+        const descriptor: DescriptorEntity = new DescriptorEntity('test::basingPath:');
+        descriptor.imports = [new ImportEntity('test::alias/test::file:')];
+
+        const pathAlias: PathAlias = new PathAlias();
+        pathAlias.regExp = /test::alias\//;
+        pathAlias.targetPath = 'test::target/path/';
+        const config: ConfigEntity = new ConfigEntity();
+        config.pathAliases = [pathAlias];
+        config.basePath = 'test::globalBasePath';
+
+        fileClient.makeImportPathsAbsolute(descriptor, config);
+
+        expect(dirname).toHaveBeenCalledWith('test::basingPath:');
+        expect(resolve).toHaveBeenCalledWith('test::globalBasePath', 'test::target/path/test::file:');
         expect(descriptor.imports[0].file).toBe('test::resolvedFile:');
     });
 });

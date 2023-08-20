@@ -2,18 +2,22 @@ import NameGlobalizer from './NameGlobalizer';
 import path from 'path';
 import StringHelper from '../../../StringHelper';
 import DescriptorEntity, {ClassEntity, RequirementEntity} from '../../../DescriptorEntity';
+import ConfigEntity, {PathAlias} from 'Core/Configuration/ConfigEntity';
 import Spy = jasmine.Spy;
 
 describe('NameGlobalizer', function (): void {
     let nameGlobalizer: NameGlobalizer,
-        dirname: Spy<typeof path.dirname>
+        dirname: Spy<typeof path.dirname>,
+        normalize: Spy<typeof path.normalize>
     ;
 
     beforeEach(function (): void {
         dirname = jasmine.createSpy<typeof path.dirname>();
+        normalize = jasmine.createSpy<typeof path.normalize>();
         nameGlobalizer = new NameGlobalizer(
             dirname,
-            new StringHelper()
+            new StringHelper(),
+            normalize
         );
     });
 
@@ -35,8 +39,9 @@ describe('NameGlobalizer', function (): void {
         descriptor.requires.set('ExampleClass', [requirement]);
         const classItem: ClassEntity = new ClassEntity('ExampleClass');
         descriptor.provides = [classItem];
+        normalize.and.callFake(x => x);
 
-        nameGlobalizer.makeClassesGlobalUnique(descriptor, 'root/src');
+        nameGlobalizer.makeClassesGlobalUnique(descriptor, 'root/src', new ConfigEntity());
 
         expect(dirname).toHaveBeenCalledWith('root/src/Domain/Name/Example');
         expect(classItem.name).toBe('DomainNameExampleClass');
@@ -44,4 +49,30 @@ describe('NameGlobalizer', function (): void {
         expect(requirement.import.alias.name).toBe('OtherDomainRequiredClass');
         expect(requirement.parameter).toBe('otherDomainRequiredClass');
     });
+
+    it(
+        'should make the name of given classes global non conflict-able for aliased imports',
+        async function (): Promise<void> {
+            dirname.and.returnValues('root/Global/src/Domain/Name');
+
+            const pathAlias: PathAlias = new PathAlias();
+            pathAlias.regExp = /^Global\//;
+            pathAlias.name = 'Global/';
+            pathAlias.targetPath = 'Global/src';
+            const config: ConfigEntity = new ConfigEntity();
+            config.pathAliases = [pathAlias];
+            config.basePath = 'root';
+
+            const descriptor: DescriptorEntity = new DescriptorEntity('root/Global/src/Domain/Name/Example');
+            const classItem: ClassEntity = new ClassEntity('ExampleClass');
+            descriptor.provides = [classItem];
+
+            normalize.and.callFake(x => x.replace('//', '/'));
+
+            nameGlobalizer.makeClassesGlobalUnique(descriptor, 'root/src', config);
+
+            expect(dirname).toHaveBeenCalledWith('root/Global/src/Domain/Name/Example');
+            expect(classItem.name).toBe('GlobalDomainNameExampleClass');
+        }
+    );
 });

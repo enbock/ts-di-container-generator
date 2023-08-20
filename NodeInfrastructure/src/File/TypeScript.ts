@@ -6,6 +6,7 @@ import Parser from 'Infrastructure/File/Parser/Parser';
 import FileClient, {FileError} from 'Core/File/FileClient';
 import CatchHelper from 'Core/CatchHelper';
 import fs from 'fs';
+import ConfigEntity, {PathAlias} from 'Core/Configuration/ConfigEntity';
 
 class NotLoadable extends Error {
 }
@@ -19,10 +20,10 @@ export default class TypeScript implements FileClient {
     ) {
     }
 
-    public extract(basePath: string, file: FileName): DescriptorEntity {
-        const modulePath: string = this.resolve(basePath, file);
-
+    public extract(basePath: string, file: FileName, config: ConfigEntity): DescriptorEntity {
+        let modulePath: string = this.resolveModulePath(basePath, file, config);
         let sourceFile: SourceFile | undefined;
+
         try {
             sourceFile = this.tryLoadFile(modulePath, '.ts');
         } catch (error) {
@@ -44,6 +45,12 @@ export default class TypeScript implements FileClient {
         return result;
     }
 
+    private resolveModulePath(basePath: string, file: string, config: ConfigEntity): string {
+        const globalPathAlias: PathAlias | undefined = config.pathAliases.find(pa => pa.regExp.test(file));
+        if (globalPathAlias === undefined) return this.resolve(basePath, file);
+        return this.resolve(config.basePath, file.replace(globalPathAlias.regExp, globalPathAlias.targetPath));
+    }
+
     private tryLoadFile(modulePath: string, suffix: string): SourceFile | undefined {
         const filePath: string = modulePath + suffix;
         if (this.fileExistsSync(filePath) == false) throw new NotLoadable();
@@ -55,10 +62,10 @@ export default class TypeScript implements FileClient {
         return sourceFile;
     }
 
-    public makeImportPathsAbsolute(descriptor: DescriptorEntity): void {
+    public makeImportPathsAbsolute(descriptor: DescriptorEntity, config: ConfigEntity): void {
         const dirname: string = this.dirname(descriptor.file);
         for (const i of descriptor.imports) {
-            i.file = this.resolve(dirname, i.file);
+            i.file = this.resolveModulePath(dirname, i.file, config);
         }
     }
 }

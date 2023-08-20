@@ -1,3 +1,4 @@
+/// <reference path="../../Core/src/global.d.ts" />
 import path from 'path';
 import FileName from 'Core/File/FileName';
 import DependencyInjectionContainer from './DependencyInjection/Container.dist';
