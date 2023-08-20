@@ -4,7 +4,6 @@ import FileName from 'Core/File/FileName';
 import DescriptorEntity from 'Core/DescriptorEntity';
 import Parser from 'Infrastructure/File/Parser/Parser';
 import FileClient, {FileError} from 'Core/File/FileClient';
-import * as console from 'console';
 import CatchHelper from 'Core/CatchHelper';
 import fs from 'fs';
 
@@ -22,8 +21,6 @@ export default class TypeScript implements FileClient {
 
     public extract(basePath: string, file: FileName): DescriptorEntity {
         const modulePath: string = this.resolve(basePath, file);
-
-        console.log('Parse', modulePath, '...');
 
         let sourceFile: SourceFile | undefined;
         try {

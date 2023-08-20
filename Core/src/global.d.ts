@@ -1,0 +1,1 @@
+type throwErrorOrReturn<E extends Error, T> = T;

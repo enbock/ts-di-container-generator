@@ -30,6 +30,10 @@ export default class ImportParser implements Parser {
     private parseImportName(node: Identifier, result: DescriptorEntity, modulePath: string): void {
         let alias: AliasEntity = new AliasEntity(String(node.escapedText));
         let importAlias: ImportEntity = new ImportEntity(modulePath, alias);
+        this.correctPathAndSave(importAlias, result);
+    }
+
+    private correctPathAndSave(importAlias: ImportEntity, result: DescriptorEntity): void {
         result.imports.push(importAlias);
     }
 
@@ -46,6 +50,7 @@ export default class ImportParser implements Parser {
         let alias: AliasEntity = new AliasEntity(String(node.name.escapedText));
         let importAlias: ImportEntity = new ImportEntity(modulePath, alias);
         result.imports.push(importAlias);
+        this.correctPathAndSave(importAlias, result);
     }
 
     private addNamedImports(node: NamedImports, modulePath: string, result: DescriptorEntity): void {

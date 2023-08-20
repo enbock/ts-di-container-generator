@@ -1,6 +1,6 @@
 {
   "name": "@enbock/ts-di-container-generator",
-  "version": "0.1.0-dev34",
+  "version": "0.1.0-dev35",
   "license": "MIT",
   "author": "Endre Bock <endre@itbock.de>",
   "publishConfig": {
@@ -24,9 +24,9 @@
     "@types/node": "^18",
     "jasmine": "^4",
     "jasmine-auto-spies": "^7",
-    "ts-loader": "^9.4.2",
+    "ts-loader": "^9",
+    "tsconfig-paths": "^4",
     "webpack": "^5",
-    "webpack-cli": "^5",
-    "tsconfig-paths": "^4"
+    "webpack-cli": "^5"
   }
 }

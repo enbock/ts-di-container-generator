@@ -1,0 +1,1 @@
+- sanitize ts-aliases to relative paths
