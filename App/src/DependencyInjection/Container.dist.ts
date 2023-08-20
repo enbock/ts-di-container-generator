@@ -1,5 +1,5 @@
 import StringHelper from 'Core/StringHelper';
-import TypeScript from 'Infrastructure/File/TypeScript';
+import FileTypeScript from 'Infrastructure/File/TypeScript';
 import Controller from '../Controller/Controller';
 import ClassParser from 'Infrastructure/File/Parser/ClassParser';
 import ImportParser from 'Infrastructure/File/Parser/ImportParser';
@@ -7,7 +7,7 @@ import InterfaceParser from 'Infrastructure/File/Parser/InterfaceParser';
 import ContainerClassGenerator from 'Core/Generator/Interactor/Task/ContainerClassGenerator';
 import ContainerObjectGenerator from 'Core/Generator/Interactor/Task/ContainerObjectGenerator';
 import fs from 'fs';
-import Parser from 'Infrastructure/File/Parser/Parser';
+import FileParser from 'Infrastructure/File/Parser/Parser';
 import SanitizerService from 'Core/Generator/Sanitizer/SanitizerService';
 import RootDependencyParser from 'Infrastructure/File/Parser/RootDependencyParser';
 import path from 'path';
@@ -21,14 +21,19 @@ import Presenter from '../Controller/Presenter';
 import GeneratorInteractor from 'Core/Generator/Interactor/Interactor';
 import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
 import FallbackRequireNameCreator from 'Core/Generator/Sanitizer/Task/FallbackRequireNameCreator';
+import LanguageConfigUseCase from 'Core/Configuration/LanguageConfigUseCase/LanguageConfigUseCase';
+import ConfigTypeScript from 'Infrastructure/Config/TypeScript';
+import fsPromises from 'fs/promises';
+import ConfigParser from 'Infrastructure/Config/Parser';
+import ParseHelper from 'Infrastructure/ParseHelper';
 
 class Container {
-    private readonly stringHelper: StringHelper = new StringHelper();
-    private readonly classParser: Parser = new ClassParser();
-    private readonly importParser: Parser = new ImportParser();
-    private readonly interfaceParser: Parser = new InterfaceParser();
-    private readonly rootDependencyParser: Parser = new RootDependencyParser();
-    private readonly fileClient: TypeScript = new TypeScript(
+    private stringHelper: StringHelper = new StringHelper();
+    private classParser: FileParser = new ClassParser();
+    private importParser: FileParser = new ImportParser();
+    private interfaceParser: FileParser = new InterfaceParser();
+    private rootDependencyParser: FileParser = new RootDependencyParser();
+    private fileClient: FileTypeScript = new FileTypeScript(
         [
             this.classParser,
             this.importParser,
@@ -39,14 +44,14 @@ class Container {
         path.dirname,
         fs.existsSync
     );
-    private readonly containerClassGenerator: ContainerClassGenerator = new ContainerClassGenerator();
-    private readonly objectGenerator: ContainerObjectGenerator = new ContainerObjectGenerator(
+    private containerClassGenerator: ContainerClassGenerator = new ContainerClassGenerator();
+    private objectGenerator: ContainerObjectGenerator = new ContainerObjectGenerator(
         this.stringHelper
     );
-    private readonly importGenerator: ImportGenerator = new ImportGenerator(
+    private importGenerator: ImportGenerator = new ImportGenerator(
         path.dirname
     );
-    private readonly pathSanitizer: SanitizerService = new SanitizerService(
+    private pathSanitizer: SanitizerService = new SanitizerService(
         new GlobalImportRemover(),
         this.fileClient,
         new IgnoredFileRemover(),
@@ -61,8 +66,7 @@ class Container {
             this.stringHelper
         )
     );
-    private readonly generatorInteractor: GeneratorInteractor = new GeneratorInteractor(
-        this.stringHelper,
+    private generatorInteractor: GeneratorInteractor = new GeneratorInteractor(
         this.containerClassGenerator,
         this.objectGenerator,
         this.importGenerator,
@@ -71,14 +75,22 @@ class Container {
             this.pathSanitizer
         )
     );
-    private readonly presenter: Presenter = new Presenter(
+    private presenter: Presenter = new Presenter(
         this.stringHelper,
         fs.promises.writeFile,
         path.resolve
     );
-    public readonly controller: Controller = new Controller(
+    private parseHelper: ParseHelper = new ParseHelper();
+    public controller: Controller = new Controller(
         this.generatorInteractor,
-        this.presenter
+        this.presenter,
+        new LanguageConfigUseCase(
+            new ConfigTypeScript(
+                fs.existsSync,
+                fsPromises.readFile,
+                new ConfigParser(this.parseHelper)
+            )
+        )
     );
 }
 

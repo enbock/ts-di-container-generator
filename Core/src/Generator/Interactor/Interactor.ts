@@ -1,4 +1,3 @@
-import StringHelper from 'Core/StringHelper';
 import ContainerClassGenerator from 'Core/Generator/Interactor/Task/ContainerClassGenerator';
 import ContainerObjectGenerator from 'Core/Generator/Interactor/Task/ContainerObjectGenerator';
 import ImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
@@ -7,12 +6,11 @@ import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
 import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import FileName from 'Core/File/FileName';
 import DescriptorEntity, {ClassEntity, ImportEntity, InterfaceEntity, Type} from 'Core/DescriptorEntity';
-import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
+import FileExtractor, {ParameterBag} from 'Core/Generator/Interactor/Task/FileExtractor';
 import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
 
 export default class Interactor {
     constructor(
-        private stringHelper: StringHelper,
         private statementGenerator: ContainerClassGenerator,
         private objectGenerator: ContainerObjectGenerator,
         private importGenerator: ImportGenerator,
@@ -24,11 +22,14 @@ export default class Interactor {
         const failedDescriptors: Array<FailedDescriptorEntity> = [];
         let descriptors: Array<DescriptorEntity> = [];
         this.fileExtractor.extract(
-            request.basePath,
             request.mainFile,
-            request.ignoreList,
-            failedDescriptors,
-            descriptors
+            new ParameterBag(
+                request.basePath,
+                request.ignoreList,
+                failedDescriptors,
+                descriptors,
+                request.config
+            )
         );
         this.removeUnusedClasses(descriptors);
 

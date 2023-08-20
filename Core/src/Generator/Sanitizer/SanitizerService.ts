@@ -7,6 +7,7 @@ import ImportCleaner from './Task/ImportCleaner';
 import NameGlobalizer from './Task/NameGlobalizer';
 import FileClient from 'Core/File/FileClient';
 import FallbackRequireNameCreator from 'Core/Generator/Sanitizer/Task/FallbackRequireNameCreator';
+import ConfigEntity from 'Core/Configuration/ConfigEntity';
 
 export default class SanitizerService {
     constructor(
@@ -20,7 +21,12 @@ export default class SanitizerService {
     ) {
     }
 
-    public sanitizeDescriptor(descriptor: DescriptorEntity, ignoreList: Array<FileName>, basePath: string): void {
+    public sanitizeDescriptor(
+        descriptor: DescriptorEntity,
+        ignoreList: Array<FileName>,
+        basePath: string,
+        config: ConfigEntity
+    ): void {
         this.globalImportRemover.removeGlobals(descriptor);
         this.fileClient.makeImportPathsAbsolute(descriptor);
         this.ignoredFileRemover.removeIgnoredFiles(descriptor, ignoreList);

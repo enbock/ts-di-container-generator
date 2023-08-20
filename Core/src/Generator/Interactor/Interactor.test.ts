@@ -1,16 +1,15 @@
 import Interactor from './Interactor';
-import {createSpyFromClass, Spy} from 'jasmine-auto-spies';
+import {Spy} from 'jasmine-auto-spies';
 import ContainerClassGenerator from 'Core/Generator/Interactor/Task/ContainerClassGenerator';
 import ContainerObjectGenerator from 'Core/Generator/Interactor/Task/ContainerObjectGenerator';
 import ImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
-import StringHelper from 'Core/StringHelper';
 import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import MockedObject from 'Core/MockedObject';
 import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
-import FileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
+import FileExtractor, {ParameterBag} from 'Core/Generator/Interactor/Task/FileExtractor';
 import FileName from 'Core/File/FileName';
-import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
 import DescriptorEntity from 'Core/DescriptorEntity';
+import mock from 'Core/mock';
 
 describe('Interactor', function (): void {
     let interactor: Interactor,
@@ -21,13 +20,12 @@ describe('Interactor', function (): void {
     ;
 
     beforeEach(function (): void {
-        statementGenerator = createSpyFromClass(ContainerObjectGenerator);
-        objectGenerator = createSpyFromClass(ContainerObjectGenerator);
-        importGenerator = createSpyFromClass(ImportGenerator);
-        fileExtractor = createSpyFromClass(FileExtractor);
+        statementGenerator = mock<ContainerClassGenerator>();
+        objectGenerator = mock<ContainerObjectGenerator>();
+        importGenerator = mock<ImportGenerator>();
+        fileExtractor = mock<FileExtractor>();
 
         interactor = new Interactor(
-            new StringHelper(),
             statementGenerator,
             objectGenerator,
             importGenerator,
@@ -43,19 +41,17 @@ describe('Interactor', function (): void {
         statementGenerator.generate.and.returnValue(['test::objectStatements']);
         fileExtractor.extract.and.callFake(
             function (
-                basePath: string,
                 file: FileName,
-                ignoreList: Array<FileName>,
-                failedDescriptors: Array<FailedDescriptorEntity>,
-                descriptors: Array<DescriptorEntity>
+                parameters: ParameterBag
             ): void {
-                failedDescriptors.push('test::failedDescriptor:' as MockedObject);
-                descriptors.push(descriptor as MockedObject);
+                parameters.failedDescriptors.push('test::failedDescriptor:' as MockedObject);
+                parameters.descriptors.push(descriptor as MockedObject);
             }
         );
 
         const response: GenerateResponse = {statements: []};
         const request: GenerateRequest = {
+            config: 'test::config' as MockedObject,
             mainFile: 'test::targetFile:',
             basePath: 'test::basePath:',
             ignoreList: 'test::ignoreList:' as MockedObject
@@ -63,11 +59,14 @@ describe('Interactor', function (): void {
         interactor.loadAndGenerate(request, response);
 
         expect(fileExtractor.extract).toHaveBeenCalledWith(
-            'test::basePath:',
             'test::targetFile:',
-            'test::ignoreList:',
-            ['test::failedDescriptor:'],
-            [descriptor]
+            new ParameterBag(
+                'test::basePath:',
+                'test::ignoreList:' as MockedObject,
+                ['test::failedDescriptor:' as MockedObject],
+                [descriptor],
+                'test::config' as MockedObject
+            )
         );
         expect(objectGenerator.generate).toHaveBeenCalledWith([descriptor]);
         expect(importGenerator.generate).toHaveBeenCalledWith(
