@@ -4,7 +4,7 @@ import FileName from 'Core/File/FileName';
 import DependencyInjectionContainer from './DependencyInjection/Container.dist';
 import Controller from './Controller/Controller';
 
-const RootDependency: Controller = DependencyInjectionContainer.controller;
+const RootDependency: Controller = DependencyInjectionContainer.controllerController;
 
 async function main(source: string, mainFile: FileName, ignoreList: Array<FileName>): Promise<void> {
     const basePath: string = path.resolve(process.cwd(), source);

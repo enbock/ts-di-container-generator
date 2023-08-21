@@ -1,4 +1,4 @@
-import DescriptorEntity, {RequirementEntity} from '../../../DescriptorEntity';
+import DescriptorEntity, {ClassEntity, RequirementEntity} from '../../../DescriptorEntity';
 import FileName from '../../../File/FileName';
 import path from 'path';
 import StringHelper from '../../../StringHelper';
@@ -13,17 +13,18 @@ export default class NameGlobalizer {
     }
 
     public makeClassesGlobalUnique(descriptor: DescriptorEntity, basePath: string, config: ConfigEntity): void {
-        for (const classItem of descriptor.provides) {
-            const requirements: Array<RequirementEntity> = descriptor.requires.get(classItem.name) || [];
-            descriptor.requires.delete(classItem.name);
-            classItem.name = this.makeGlobalType(classItem.name, descriptor.file, basePath, config);
+        for (const providingItem of descriptor.provides) {
+            const requirements: Array<RequirementEntity> = descriptor.requires.get(providingItem.name) || [];
+            descriptor.requires.delete(providingItem.name);
+            if (providingItem instanceof ClassEntity && providingItem.isDefault)
+                providingItem.name = this.makeGlobalType(providingItem.name, descriptor.file, basePath, config);
             for (const r of requirements) {
                 const aliasName: string = r.import.alias.name;
                 if (aliasName == '') continue;
                 r.import.alias.name = this.makeGlobalType(aliasName, r.import.file, basePath, config);
                 r.parameter = this.makeGlobalProperty(aliasName, r.import.file, basePath, config);
             }
-            descriptor.requires.set(classItem.name, requirements);
+            descriptor.requires.set(providingItem.name, requirements);
         }
     }
 

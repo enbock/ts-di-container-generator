@@ -25,7 +25,7 @@ describe('ImportParser', function (): void {
         });
         const expectedImport: ImportEntity = new ImportEntity(
             './somethingsDefaultImported',
-            new AliasEntity('DefaultImport')
+            new AliasEntity('DefaultImport', '', true)
         );
         expect(result.imports).toEqual([expectedImport]);
     });
@@ -40,7 +40,7 @@ describe('ImportParser', function (): void {
         });
         const expectedImport: ImportEntity = new ImportEntity(
             './test::importedFile:',
-            new AliasEntity('SubImport')
+            new AliasEntity('SubImport', 'SubImport', false)
         );
         expect(result.imports).toEqual([expectedImport]);
     });
@@ -55,7 +55,7 @@ describe('ImportParser', function (): void {
         });
         const expectedImport: ImportEntity = new ImportEntity(
             './test::importedFile:',
-            new AliasEntity('AliasName', 'SubImport')
+            new AliasEntity('AliasName', 'SubImport', false)
         );
         expect(result.imports).toEqual([expectedImport]);
     });

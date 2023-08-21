@@ -15,7 +15,7 @@ describe('ClassParser', function (): void {
         expect(result).toEqual(new DescriptorEntity('test'));
     });
 
-    it('should parse a class', function (): void {
+    it('should skip not exported class', function (): void {
         const testSource: string = `class TestClass {}`;
         const sourceFile: SourceFile = TypeScript.createSourceFile('test', testSource, TypeScript.ScriptTarget.Latest);
 
@@ -23,12 +23,34 @@ describe('ClassParser', function (): void {
         TypeScript.forEachChild(sourceFile, (node: Node): void => {
             parser.parse(node, result);
         });
-        expect(result.provides).toEqual([new ClassEntity('TestClass')]);
+        expect(result.provides).toEqual([]);
+    });
+
+    it('should parse a class', function (): void {
+        const testSource: string = `export class TestClass {}`;
+        const sourceFile: SourceFile = TypeScript.createSourceFile('test', testSource, TypeScript.ScriptTarget.Latest);
+
+        const result: DescriptorEntity = new DescriptorEntity('test');
+        TypeScript.forEachChild(sourceFile, (node: Node): void => {
+            parser.parse(node, result);
+        });
+        expect(result.provides).toEqual([new ClassEntity('TestClass', false)]);
+    });
+
+    it('should parse a default class', function (): void {
+        const testSource: string = `export default class TestClass {}`;
+        const sourceFile: SourceFile = TypeScript.createSourceFile('test', testSource, TypeScript.ScriptTarget.Latest);
+
+        const result: DescriptorEntity = new DescriptorEntity('test');
+        TypeScript.forEachChild(sourceFile, (node: Node): void => {
+            parser.parse(node, result);
+        });
+        expect(result.provides).toEqual([new ClassEntity('TestClass', true)]);
     });
 
     it('should parse the requirements', function (): void {
         const testSource: string = `
-            class TestClass {
+            export class TestClass {
                 constructor(
                     private otherObject: OtherClass,
                     private nativeValue: string

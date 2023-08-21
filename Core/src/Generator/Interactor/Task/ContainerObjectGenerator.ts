@@ -19,9 +19,9 @@ export default class ContainerObjectGenerator {
     public generate(descriptors: DescriptorEntity[]): ClassElement[] {
         const result: ClassElement[] = [];
         for (const descriptor of descriptors) {
-            const givenClasses: Array<InterfaceEntity | ClassEntity> = descriptor.provides.filter(
+            const givenClasses: Array<ClassEntity> = descriptor.provides.filter(
                 (p: InterfaceEntity | ClassEntity): boolean => p.type == Type.CLASS
-            );
+            ) as Array<ClassEntity>;
             for (const givenClass of givenClasses) {
                 result.push(
                     this.generateProperty(givenClass)

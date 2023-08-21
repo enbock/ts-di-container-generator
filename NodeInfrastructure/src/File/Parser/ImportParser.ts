@@ -28,12 +28,12 @@ export default class ImportParser implements Parser {
     }
 
     private parseImportName(node: Identifier, result: DescriptorEntity, modulePath: string): void {
-        let alias: AliasEntity = new AliasEntity(String(node.escapedText));
-        let importAlias: ImportEntity = new ImportEntity(modulePath, alias);
-        this.correctPathAndSave(importAlias, result);
+        let alias: AliasEntity = new AliasEntity(String(node.escapedText), '', true);
+        this.addToImports(alias, modulePath, result);
     }
 
-    private correctPathAndSave(importAlias: ImportEntity, result: DescriptorEntity): void {
+    private addToImports(alias: AliasEntity, modulePath: string, result: DescriptorEntity): void {
+        let importAlias: ImportEntity = new ImportEntity(modulePath, alias);
         result.imports.push(importAlias);
     }
 
@@ -47,18 +47,18 @@ export default class ImportParser implements Parser {
     }
 
     private addNamespace(node: NamespaceImport, modulePath: string, result: DescriptorEntity): void {
-        let alias: AliasEntity = new AliasEntity(String(node.name.escapedText));
-        let importAlias: ImportEntity = new ImportEntity(modulePath, alias);
-        result.imports.push(importAlias);
-        this.correctPathAndSave(importAlias, result);
+        let alias: AliasEntity = new AliasEntity(String(node.name.escapedText), String(node.name.escapedText));
+        this.addToImports(alias, modulePath, result);
     }
 
     private addNamedImports(node: NamedImports, modulePath: string, result: DescriptorEntity): void {
         for (const element of node.elements) {
-            let alias: AliasEntity = new AliasEntity(String(element.name.escapedText));
+            let alias: AliasEntity = new AliasEntity(
+                String(element.name.escapedText),
+                String(element.name.escapedText)
+            );
             if (element.propertyName) alias.origin = String(element.propertyName.escapedText);
-            let importAlias: ImportEntity = new ImportEntity(modulePath, alias);
-            result.imports.push(importAlias);
+            this.addToImports(alias, modulePath, result);
         }
     }
 }

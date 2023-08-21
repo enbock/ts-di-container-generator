@@ -85,7 +85,7 @@ class Container {
         path.resolve
     );
     private parseHelper: ParseHelper = new ParseHelper();
-    public controller: Controller = new Controller(
+    public controllerController: Controller = new Controller(
         this.generatorInteractor,
         this.presenter,
         new LanguageConfigUseCase(

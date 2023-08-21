@@ -24,7 +24,7 @@ describe('ImportCleaner', function (): void {
             ]
         );
 
-        importCleaner.removeUnneededImports(descriptor);
+        importCleaner.replaceImportsByRequirements(descriptor);
 
         expect(descriptor.imports).toEqual([neededImport]);
     });

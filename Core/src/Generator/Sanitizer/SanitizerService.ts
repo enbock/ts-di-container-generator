@@ -31,7 +31,7 @@ export default class SanitizerService {
         this.fileClient.makeImportPathsAbsolute(descriptor, config);
         this.ignoredFileRemover.removeIgnoredFiles(descriptor, ignoreList);
         this.requirementResolver.revolveRequiredImports(descriptor);
-        this.importCleaner.removeUnneededImports(descriptor);
+        this.importCleaner.replaceImportsByRequirements(descriptor);
         this.nameGlobalizer.makeClassesGlobalUnique(descriptor, basePath, config);
         this.fallbackRequireNameCreator.addRequireName(descriptor, basePath);
     }

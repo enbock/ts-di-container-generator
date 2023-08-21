@@ -37,7 +37,7 @@ describe('NameGlobalizer', function (): void {
         requirement.import.file = 'root/src/OtherDomain/RequiredClass';
         requirement.import.alias.name = 'RequiredClass';
         descriptor.requires.set('ExampleClass', [requirement]);
-        const classItem: ClassEntity = new ClassEntity('ExampleClass');
+        const classItem: ClassEntity = new ClassEntity('ExampleClass', true);
         descriptor.provides = [classItem];
         normalize.and.callFake(x => x);
 
@@ -64,7 +64,7 @@ describe('NameGlobalizer', function (): void {
             config.basePath = 'root';
 
             const descriptor: DescriptorEntity = new DescriptorEntity('root/Global/src/Domain/Name/Example');
-            const classItem: ClassEntity = new ClassEntity('ExampleClass');
+            const classItem: ClassEntity = new ClassEntity('ExampleClass', true);
             descriptor.provides = [classItem];
 
             normalize.and.callFake(x => x.replace('//', '/'));

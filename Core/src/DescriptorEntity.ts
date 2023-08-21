@@ -10,12 +10,16 @@ export enum Type {
 export class AliasEntity {
     constructor(
         public name: AliasName = '',
-        public origin: string = ''
+        public origin: string = '',
+        public isDefault: boolean = false
     ) {
     }
 
     public toString(): string {
-        return '[Alias: ' + (this.origin ? this.origin + ' as ' : '') + this.name + ']';
+        return '[' +
+            (this.isDefault ? 'Default-' : '') + 'Alias: ' +
+            (this.origin ? this.origin + ' as ' : '') + this.name +
+            ']';
     }
 }
 
@@ -36,7 +40,8 @@ export class ClassEntity {
     public readonly type: Type = Type.CLASS;
 
     constructor(
-        public name: string
+        public name: string,
+        public isDefault: boolean = false
     ) {
     }
 

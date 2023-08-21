@@ -1,7 +1,7 @@
 import DescriptorEntity from '../../../DescriptorEntity';
 
 export default class ImportCleaner {
-    public removeUnneededImports(descriptor: DescriptorEntity): void {
+    public replaceImportsByRequirements(descriptor: DescriptorEntity): void {
         descriptor.imports = [...descriptor.requires.values()]
             .flat()
             .filter(e => e.import.file != '')
