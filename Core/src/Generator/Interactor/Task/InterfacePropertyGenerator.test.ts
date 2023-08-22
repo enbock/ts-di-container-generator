@@ -1,4 +1,3 @@
-import ContainerObjectGenerator from './ContainerObjectGenerator';
 import StringHelper from '../../../StringHelper';
 import TypeScript, {
     ClassDeclaration,
@@ -11,14 +10,15 @@ import TypeScript, {
     Statement,
     SyntaxKind
 } from 'typescript';
-import DescriptorEntity, {AliasName, ClassEntity, RequirementEntity} from '../../../DescriptorEntity';
+import DescriptorEntity, {InterfaceEntity} from '../../../DescriptorEntity';
+import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
 
-describe('ContainerObjectGenerator', function () {
-    let generator: ContainerObjectGenerator;
+describe('InterfacePropertyGenerator', function () {
+    let generator: InterfacePropertyGenerator;
     const printer: Printer = TypeScript.createPrinter({newLine: TypeScript.NewLineKind.LineFeed});
 
     beforeEach(function () {
-        generator = new ContainerObjectGenerator(new StringHelper());
+        generator = new InterfacePropertyGenerator(new StringHelper());
     });
 
     function generateCode(result: ClassElement[]): string {
@@ -40,31 +40,14 @@ describe('ContainerObjectGenerator', function () {
 
     it('should generates an property for a class', async function (): Promise<void> {
         const descriptor: DescriptorEntity = new DescriptorEntity('test::file:');
-        const objectRequirement: RequirementEntity = new RequirementEntity('injectedClass', 'OtherClass');
-        objectRequirement.import.file = 'test::file:';
-        const nativeTypeRequirement: RequirementEntity = new RequirementEntity('nativeValue', '');
-        descriptor.requires = new Map<AliasName, RequirementEntity[]>(
-            [
-                [
-                    'ClassToCreate',
-                    [objectRequirement, nativeTypeRequirement]
-                ]
-            ]
-        );
-        descriptor.provides = [new ClassEntity('ClassToCreate')];
+        const interfaceElement: InterfaceEntity = new InterfaceEntity('InterfaceToCreate');
+        descriptor.provides = [interfaceElement];
 
         const result: ClassElement[] = generator.generate([descriptor]);
 
         const code: string = generateCode(result);
         expect(code).toContain(
-            'private _classToCreate?: ClassToCreate;'
-        );
-        expect(code).toContain(
-            'public get classToCreate(): ClassToCreate { ' +
-            'if (this._classToCreate)' +
-            '\n        return this._classToCreate;' +
-            '\n    else' +
-            '\n        return this._classToCreate = new ClassToCreate(this.injectedClass, this.manualInjections.classToCreateNativeValue);'
+            'public interfaceToCreate: InterfaceToCreate = this.interfaceInstances.interfaceToCreate;'
         );
     });
 });

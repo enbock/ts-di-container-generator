@@ -55,8 +55,7 @@ export class RequirementEntity {
 
     constructor(
         public parameter: string,
-        public type: AliasName = '',
-        public isLinked: boolean = false
+        public type: AliasName = ''
     ) {
     }
 

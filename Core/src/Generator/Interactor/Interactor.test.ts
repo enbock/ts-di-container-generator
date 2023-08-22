@@ -10,13 +10,15 @@ import FileExtractor, {ParameterBag} from 'Core/Generator/Interactor/Task/FileEx
 import FileName from 'Core/File/FileName';
 import DescriptorEntity from 'Core/DescriptorEntity';
 import mock from 'Core/mock';
+import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
 
 describe('Interactor', function (): void {
     let interactor: Interactor,
         statementGenerator: Spy<ContainerClassGenerator>,
         objectGenerator: Spy<ContainerObjectGenerator>,
         importGenerator: Spy<ImportGenerator>,
-        fileExtractor: Spy<FileExtractor>
+        fileExtractor: Spy<FileExtractor>,
+        interfacePropertyGenerator: Spy<InterfacePropertyGenerator>
     ;
 
     beforeEach(function (): void {
@@ -24,12 +26,14 @@ describe('Interactor', function (): void {
         objectGenerator = mock<ContainerObjectGenerator>();
         importGenerator = mock<ImportGenerator>();
         fileExtractor = mock<FileExtractor>();
+        interfacePropertyGenerator = mock<InterfacePropertyGenerator>();
 
         interactor = new Interactor(
             statementGenerator,
             objectGenerator,
             importGenerator,
-            fileExtractor
+            fileExtractor,
+            interfacePropertyGenerator
         );
     });
 
@@ -37,6 +41,7 @@ describe('Interactor', function (): void {
         const descriptor: DescriptorEntity = new DescriptorEntity('test::descriptor:');
 
         objectGenerator.generate.and.returnValue(['test::objectMembers:']);
+        interfacePropertyGenerator.generate.and.returnValue(['test::interfaceProperties:']);
         importGenerator.generate.and.returnValue(['test::importStatements:']);
         statementGenerator.generate.and.returnValue(['test::objectStatements']);
         fileExtractor.extract.and.callFake(
@@ -74,7 +79,10 @@ describe('Interactor', function (): void {
             'test::basePath:',
             'test::config'
         );
-        expect(statementGenerator.generate).toHaveBeenCalledWith(['test::objectMembers:']);
+        expect(statementGenerator.generate).toHaveBeenCalledWith([
+            'test::interfaceProperties:',
+            'test::objectMembers:'
+        ]);
         expect(response.statements).toEqual(['test::importStatements:', 'test::objectStatements'] as MockedObject);
     });
 });

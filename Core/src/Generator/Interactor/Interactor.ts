@@ -14,13 +14,15 @@ import DescriptorEntity, {
 import FileExtractor, {ParameterBag} from 'Core/Generator/Interactor/Task/FileExtractor';
 import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
 import ConfigEntity from 'Core/Configuration/ConfigEntity';
+import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
 
 export default class Interactor {
     constructor(
         private statementGenerator: ContainerClassGenerator,
         private objectGenerator: ContainerObjectGenerator,
         private importGenerator: ImportGenerator,
-        private fileExtractor: FileExtractor
+        private fileExtractor: FileExtractor,
+        private interfacePropertyGenerator: InterfacePropertyGenerator
     ) {
     }
 
@@ -75,17 +77,11 @@ export default class Interactor {
                         if (p.type == Type.INTERFACE) return true;
 
                         const findByClassName = allImports.find(
-                            (i: ImportEntity): boolean => i.alias.name == p.name
+                            (i: ImportEntity): boolean => i.alias.name == p.name || i.alias.origin == p.name
                         ) !== undefined;
                         if (findByClassName) return true;
-                        //
-                        // const findByFile = allImports.find(
-                        //     (i: ImportEntity): boolean => i.file == d.file
-                        // );
-                        // if (!findByFile) console.log('Removed::', p);
 
                         console.log('Removed::', p);
-                        // return findByFile !== undefined;
                         return false;
                     }
                 );
@@ -110,7 +106,10 @@ export default class Interactor {
         descriptors: Array<DescriptorEntity>,
         config: ConfigEntity
     ): Array<ts.Statement> {
-        const members: ClassElement[] = this.objectGenerator.generate(descriptors);
+        const members: ClassElement[] = [
+            ...this.interfacePropertyGenerator.generate(descriptors),
+            ...this.objectGenerator.generate(descriptors)
+        ];
         return [
             ...this.importGenerator.generate(descriptors, basePath, config),
             ...this.statementGenerator.generate(members)

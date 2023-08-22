@@ -27,6 +27,7 @@ import fsPromises from 'fs/promises';
 import ConfigParser from 'Infrastructure/Config/Parser';
 import ParseHelper from 'Infrastructure/ParseHelper';
 import * as process from 'process';
+import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
 
 class Container {
     private stringHelper: StringHelper = new StringHelper();
@@ -77,7 +78,8 @@ class Container {
         new FileExtractor(
             this.fileClient,
             this.pathSanitizer
-        )
+        ),
+        new InterfacePropertyGenerator(this.stringHelper)
     );
     private presenter: Presenter = new Presenter(
         this.stringHelper,

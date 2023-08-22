@@ -16,7 +16,7 @@ describe('ImportCleaner', function (): void {
             unneededImport,
             neededImport
         ];
-        const requirement: RequirementEntity = new RequirementEntity('requiredParameter', '', false);
+        const requirement: RequirementEntity = new RequirementEntity('requiredParameter', '');
         requirement.import = neededImport;
         descriptor.requires.set(
             'SomeClass', [

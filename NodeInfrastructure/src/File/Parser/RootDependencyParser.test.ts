@@ -19,7 +19,7 @@ describe('RootDependencyParser', function (): void {
         });
 
         const expectedRequirement: Map<string, Array<RequirementEntity>> = new Map();
-        expectedRequirement.set('', [new RequirementEntity('', 'ThisDependency', false)]);
+        expectedRequirement.set('', [new RequirementEntity('', 'ThisDependency')]);
         expect(result.requires.keys()).toEqual(expectedRequirement.keys());
         expect(result.requires.values()).toEqual(expectedRequirement.values());
     });

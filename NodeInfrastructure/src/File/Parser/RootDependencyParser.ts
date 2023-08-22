@@ -23,7 +23,7 @@ export default class RootDependencyParser implements Parser {
             ((rootDependency.type as TypeReferenceNode | undefined)?.typeName as Identifier).escapedText || '';
 
         const globalRequire: Array<RequirementEntity> = result.requires.get('') || [];
-        globalRequire.push(new RequirementEntity('', requiredClass, false));
+        globalRequire.push(new RequirementEntity('', requiredClass));
         result.requires.set('', globalRequire);
     }
 }

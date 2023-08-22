@@ -1,4 +1,4 @@
-import DescriptorEntity, {ClassEntity, RequirementEntity} from '../../../DescriptorEntity';
+import DescriptorEntity, {ClassEntity, InterfaceEntity, RequirementEntity} from '../../../DescriptorEntity';
 import FileName from '../../../File/FileName';
 import path from 'path';
 import StringHelper from '../../../StringHelper';
@@ -16,7 +16,10 @@ export default class NameGlobalizer {
         for (const providingItem of descriptor.provides) {
             const requirements: Array<RequirementEntity> = descriptor.requires.get(providingItem.name) || [];
             descriptor.requires.delete(providingItem.name);
-            if (providingItem instanceof ClassEntity && providingItem.isDefault)
+            if (
+                (providingItem instanceof ClassEntity && providingItem.isDefault) ||
+                providingItem instanceof InterfaceEntity
+            )
                 providingItem.name = this.makeGlobalType(providingItem.name, descriptor.file, basePath, config);
             for (const r of requirements) {
                 const aliasName: string = r.import.alias.name;
