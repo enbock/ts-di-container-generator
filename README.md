@@ -48,7 +48,7 @@ npx @enbock/ts-di-container-generator@0.1.0-dev36 <source-directory> <start-file
 Example
 
 ```shell
-npx @enbock/ts-di-container-generator src index
+npx @enbock/ts-di-container-generator@0.1.0-dev36 src index
 ```
 
 # FAQ
