@@ -1,7 +1,7 @@
 import ContainerClassGenerator from 'Core/Generator/Interactor/Task/ContainerClassGenerator';
 import ContainerObjectGenerator from 'Core/Generator/Interactor/Task/ContainerObjectGenerator';
 import ImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
-import ts, {ClassElement} from 'typescript';
+import ts, {ClassElement, NodeArray, Statement} from 'typescript';
 import GenerateRequest from 'Core/Generator/Interactor/GenerateRequest';
 import GenerateResponse from 'Core/Generator/Interactor/GenerateResponse';
 import DescriptorEntity, {
@@ -15,6 +15,11 @@ import FileExtractor, {ParameterBag} from 'Core/Generator/Interactor/Task/FileEx
 import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
 import ConfigEntity from 'Core/Configuration/ConfigEntity';
 import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
+
+interface StructureResult {
+    imports: Array<ts.Statement>;
+    members: NodeArray<Statement>;
+}
 
 export default class Interactor {
     constructor(
@@ -46,7 +51,9 @@ export default class Interactor {
         console.log('Failed:', failedDescriptors);
         console.log('Loaded:', descriptors.join('\n'));
 
-        response.statements = this.generateStructure(request.basePath, descriptors, request.config);
+        const data: StructureResult = this.generateStructure(request.basePath, descriptors, request.config);
+        response.imports = data.imports;
+        response.statements = data.members as unknown as Array<Statement>;
     }
 
     private sanitizeDefaultImportAliases(descriptors: Array<DescriptorEntity>, allImports: Array<ImportEntity>): void {
@@ -105,14 +112,14 @@ export default class Interactor {
         basePath: string,
         descriptors: Array<DescriptorEntity>,
         config: ConfigEntity
-    ): Array<ts.Statement> {
+    ): StructureResult {
         const members: ClassElement[] = [
             ...this.interfacePropertyGenerator.generate(descriptors),
             ...this.objectGenerator.generate(descriptors)
         ];
-        return [
-            ...this.importGenerator.generate(descriptors, basePath, config),
-            ...this.statementGenerator.generate(members)
-        ];
+        return {
+            imports: this.importGenerator.generate(descriptors, basePath, config),
+            members: this.statementGenerator.generate(members)
+        };
     }
 }

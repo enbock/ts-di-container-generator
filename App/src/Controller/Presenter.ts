@@ -4,6 +4,8 @@ import FileName from 'Core/File/FileName';
 import StringHelper from 'Core/StringHelper';
 import fs from 'fs';
 import path from 'path';
+import ManualCodeResponse from 'App/Controller/ManualCodeResponse';
+import InterfaceNodeEntity from 'Core/File/InterfaceNodeEntity';
 
 export default class Presenter {
     private printer: Printer = TypeScript.createPrinter({newLine: TypeScript.NewLineKind.LineFeed});
@@ -15,11 +17,20 @@ export default class Presenter {
     ) {
     }
 
-    public async present(generateResponse: GenerateResponse, basePath: string): Promise<void> {
+    public async present(
+        generateResponse: GenerateResponse,
+        basePath: string,
+        manualCodeResponse: ManualCodeResponse
+    ): Promise<void> {
         const containerPath: string = this.resolve(basePath, './DependencyInjection/Container');
         const targetFile: FileName = containerPath + '.ts';
 
-        const statements: NodeArray<Statement> = TypeScript.factory.createNodeArray(generateResponse.statements);
+        const statements: NodeArray<Statement> = TypeScript.factory.createNodeArray(
+            [
+                ...generateResponse.imports,
+                ...Object.values<InterfaceNodeEntity>(manualCodeResponse.code.manualCode).map(x => x.node),
+                ...generateResponse.statements
+            ]);
         let node: SourceFile = TypeScript.factory.createSourceFile(
             statements,
             TypeScript.factory.createToken(SyntaxKind.EndOfFileToken),

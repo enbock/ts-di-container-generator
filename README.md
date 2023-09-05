@@ -42,13 +42,13 @@ dependency marker for the static code analyser.
 *Syntax:*
 
 ```
-npx @enbock/ts-di-container-generator@0.1.0-dev36 <source-directory> <start-file> [... <excluded-file-or-path>]
+npx @enbock/ts-di-container-generator@0.1.0-dev38 <source-directory> <start-file> [... <excluded-file-or-path>]
 ```
 
 Example
 
 ```shell
-npx @enbock/ts-di-container-generator@0.1.0-dev36 src index
+npx @enbock/ts-di-container-generator@0.1.0-dev38 src index
 ```
 
 # FAQ

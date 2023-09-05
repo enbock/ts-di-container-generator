@@ -54,7 +54,7 @@ describe('Interactor', function (): void {
             }
         );
 
-        const response: GenerateResponse = {statements: []};
+        const response: GenerateResponse = {statements: [], imports: []};
         const request: GenerateRequest = {
             config: 'test::config' as MockedObject,
             mainFile: 'test::targetFile:',
@@ -83,6 +83,7 @@ describe('Interactor', function (): void {
             'test::interfaceProperties:',
             'test::objectMembers:'
         ]);
-        expect(response.statements).toEqual(['test::importStatements:', 'test::objectStatements'] as MockedObject);
+        expect(response.imports).toEqual(['test::importStatements:'] as MockedObject);
+        expect(response.statements).toEqual(['test::objectStatements'] as MockedObject);
     });
 });

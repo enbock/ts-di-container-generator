@@ -28,6 +28,8 @@ import ConfigParser from 'Infrastructure/Config/Parser';
 import ParseHelper from 'Infrastructure/ParseHelper';
 import * as process from 'process';
 import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
+import NamedInterfaceParser from 'Infrastructure/File/Parser/NamedInterfaceParser';
+import ManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
 
 class Container {
     private stringHelper: StringHelper = new StringHelper();
@@ -44,7 +46,8 @@ class Container {
         ],
         path.resolve,
         path.dirname,
-        fs.existsSync
+        fs.existsSync,
+        new NamedInterfaceParser()
     );
     private containerClassGenerator: ContainerClassGenerator = new ContainerClassGenerator();
     private objectGenerator: ContainerObjectGenerator = new ContainerObjectGenerator(
@@ -101,6 +104,14 @@ class Container {
                 process.cwd,
                 path.resolve
             )
+        ),
+        new ManualCodeUseCase(
+            this.fileClient,
+            [
+                'ManualInjections',
+                'InterfaceInstances',
+                'AdditionalResources'
+            ]
         )
     );
 }

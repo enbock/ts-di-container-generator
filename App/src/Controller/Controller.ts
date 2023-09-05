@@ -4,13 +4,16 @@ import GenerateResponse from './GenerateResponse';
 import Presenter from './Presenter';
 import FileName from 'Core/File/FileName';
 import LanguageConfigUseCase from 'Core/Configuration/LanguageConfigUseCase/LanguageConfigUseCase';
+import ManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
+import ManualCodeResponse from 'App/Controller/ManualCodeResponse';
 
 export default class Controller {
 
     constructor(
         private generatorInteractor: GeneratorInteractor,
         private presenter: Presenter,
-        private configUseCase: LanguageConfigUseCase
+        private configUseCase: LanguageConfigUseCase,
+        private manualCodeUseCase: ManualCodeUseCase
     ) {
     }
 
@@ -24,6 +27,10 @@ export default class Controller {
 
         await this.configUseCase.getConfig(configResponseAndGenerateRequest);
         this.generatorInteractor.loadAndGenerate(configResponseAndGenerateRequest, generateResponse);
-        await this.presenter.present(generateResponse, basePath);
+
+        const manualCodeResponse: ManualCodeResponse = new ManualCodeResponse();
+        this.manualCodeUseCase.extractManualModifiableInterfaces({basePath: basePath}, manualCodeResponse);
+
+        await this.presenter.present(generateResponse, basePath, manualCodeResponse);
     }
 }
