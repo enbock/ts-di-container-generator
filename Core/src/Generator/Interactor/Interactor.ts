@@ -52,7 +52,16 @@ export default class Interactor {
         console.log('Loaded:', descriptors.join('\n'));
 
         const data: StructureResult = this.generateStructure(request.basePath, descriptors, request.config);
-        response.imports = data.imports;
+        response.imports = [
+            ...data.imports,
+            ...this.importGenerator.generateImportList(
+                descriptors,
+                request.additionalImports,
+                request.basePath,
+                request.config,
+                true
+            )
+        ];
         response.statements = data.members as unknown as Array<Statement>;
     }
 
@@ -118,7 +127,7 @@ export default class Interactor {
             ...this.objectGenerator.generate(descriptors)
         ];
         return {
-            imports: this.importGenerator.generate(descriptors, basePath, config),
+            imports: this.importGenerator.generate(descriptors, basePath, config, false),
             members: this.statementGenerator.generate(members)
         };
     }

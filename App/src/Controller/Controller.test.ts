@@ -12,6 +12,8 @@ import ManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
 import ManualCodeResponse from 'App/Controller/ManualCodeResponse';
 import ExtractRequest from 'Core/ManualCodeUseCase/ExtractRequest';
 import ExtractResponse from 'Core/ManualCodeUseCase/ExtractResponse';
+import ManualCodeEntity from 'Core/ManualCodeUseCase/ManualCodeEntity';
+import InterfaceNodeEntity from 'Core/File/InterfaceNodeEntity';
 
 describe('Controller', function (): void {
     let controller: Controller,
@@ -38,6 +40,11 @@ describe('Controller', function (): void {
     it('should generate TypeScript file', async function (): Promise<void> {
         let generateResponse: GenerateResponse = new GenerateResponse();
         let manualCodeResponse: ManualCodeResponse = new ManualCodeResponse();
+        const code: ManualCodeEntity = new ManualCodeEntity();
+        const interfaceNode: InterfaceNodeEntity = new InterfaceNodeEntity('test::code');
+        interfaceNode.imports = ['test::import' as MockedObject];
+        code.manualCode['test::code'] = interfaceNode;
+
         configUseCase.getConfig.and.callFake(async function (response: ConfigResponse): Promise<void> {
             response.config = 'test::config' as MockedObject;
         });
@@ -49,12 +56,13 @@ describe('Controller', function (): void {
                 expect(request.mainFile).toBe('test::mainFile:');
                 expect(request.ignoreList).toBe('test::ignoreList:');
                 expect(request.config).toBe('test::config' as MockedObject);
+                expect(request.additionalImports).toEqual(['test::import' as MockedObject]);
             }
         );
         manualCodeUseCase.extractManualModifiableInterfaces.and.callFake(
             function (request: ExtractRequest, response: ExtractResponse): void {
                 manualCodeResponse = response;
-                response.code = 'test::code' as MockedObject;
+                response.code = code;
             }
         );
 
@@ -70,7 +78,7 @@ describe('Controller', function (): void {
             {basePath: 'test::basePath:'},
             manualCodeResponse
         );
-        expect(manualCodeResponse.code).toBe('test::code' as MockedObject);
+        expect(manualCodeResponse.code).toBe(code);
         expect(presenter.present).toHaveBeenCalledWith(generateResponse, 'test::basePath:', manualCodeResponse);
     });
 });

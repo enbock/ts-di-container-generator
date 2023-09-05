@@ -38,13 +38,14 @@ describe('ImportGenerator', function (): void {
     it('should generate import statements', async function (): Promise<void> {
         const descriptor: DescriptorEntity = new DescriptorEntity('');
         descriptor.imports = [
-            new ImportEntity('base\\path\\domain\\test::file:', new AliasEntity('test::alias:'))
+            new ImportEntity('base\\path\\domain\\test::file:', new AliasEntity('test::alias:', '', true))
         ];
 
         const result: Array<ImportDeclaration> = importGenerator.generate(
             [descriptor],
             'base\\path',
-            new ConfigEntity()
+            new ConfigEntity(),
+            false
         );
         const code: string = generateCode(result);
 
@@ -54,7 +55,7 @@ describe('ImportGenerator', function (): void {
     it('should generate import statements for aliased imports', async function (): Promise<void> {
         const descriptor: DescriptorEntity = new DescriptorEntity('');
         descriptor.imports = [
-            new ImportEntity('root\\global\\path\\domain\\test::file:', new AliasEntity('test::alias:'))
+            new ImportEntity('root\\global\\path\\domain\\test::file:', new AliasEntity('test::alias:', '', false))
         ];
 
         const alias: PathAlias = new PathAlias();
@@ -66,10 +67,11 @@ describe('ImportGenerator', function (): void {
         const result: Array<ImportDeclaration> = importGenerator.generate(
             [descriptor],
             'base\\path',
-            config
+            config,
+            false
         );
         const code: string = generateCode(result);
 
-        expect(code).toContain('import test::alias: from \'global/domain/test::file:\';');
+        expect(code).toContain('import { test::alias: } from \'global/domain/test::file:\';');
     });
 });

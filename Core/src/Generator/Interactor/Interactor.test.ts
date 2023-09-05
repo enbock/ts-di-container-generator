@@ -43,6 +43,7 @@ describe('Interactor', function (): void {
         objectGenerator.generate.and.returnValue(['test::objectMembers:']);
         interfacePropertyGenerator.generate.and.returnValue(['test::interfaceProperties:']);
         importGenerator.generate.and.returnValue(['test::importStatements:']);
+        importGenerator.generateImportList.and.returnValue(['test::additionalImports']);
         statementGenerator.generate.and.returnValue(['test::objectStatements']);
         fileExtractor.extract.and.callFake(
             function (
@@ -59,7 +60,8 @@ describe('Interactor', function (): void {
             config: 'test::config' as MockedObject,
             mainFile: 'test::targetFile:',
             basePath: 'test::basePath:',
-            ignoreList: 'test::ignoreList:' as MockedObject
+            ignoreList: 'test::ignoreList:' as MockedObject,
+            additionalImports: 'test::extraImports' as MockedObject
         };
         interactor.loadAndGenerate(request, response);
 
@@ -77,13 +79,21 @@ describe('Interactor', function (): void {
         expect(importGenerator.generate).toHaveBeenCalledWith(
             [descriptor],
             'test::basePath:',
-            'test::config'
+            'test::config',
+            false
+        );
+        expect(importGenerator.generateImportList).toHaveBeenCalledWith(
+            [descriptor],
+            'test::extraImports' as MockedObject,
+            'test::basePath:',
+            'test::config',
+            true
         );
         expect(statementGenerator.generate).toHaveBeenCalledWith([
             'test::interfaceProperties:',
             'test::objectMembers:'
         ]);
-        expect(response.imports).toEqual(['test::importStatements:'] as MockedObject);
+        expect(response.imports).toEqual(['test::importStatements:', 'test::additionalImports'] as MockedObject);
         expect(response.statements).toEqual(['test::objectStatements'] as MockedObject);
     });
 });

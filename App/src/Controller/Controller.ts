@@ -18,18 +18,19 @@ export default class Controller {
     }
 
     public async generate(basePath: string, mainFile: string, ignoreList: Array<FileName>): Promise<void> {
+        const manualCodeResponse: ManualCodeResponse = new ManualCodeResponse();
+        this.manualCodeUseCase.extractManualModifiableInterfaces({basePath: basePath}, manualCodeResponse);
+
         const configResponseAndGenerateRequest: ConfigResponseAndGenerateRequest = new ConfigResponseAndGenerateRequest(
             basePath,
             mainFile,
-            ignoreList
+            ignoreList,
+            Object.values(manualCodeResponse.code.manualCode).map(x => x.imports).flat()
         );
         const generateResponse: GenerateResponse = new GenerateResponse();
 
         await this.configUseCase.getConfig(configResponseAndGenerateRequest);
         this.generatorInteractor.loadAndGenerate(configResponseAndGenerateRequest, generateResponse);
-
-        const manualCodeResponse: ManualCodeResponse = new ManualCodeResponse();
-        this.manualCodeUseCase.extractManualModifiableInterfaces({basePath: basePath}, manualCodeResponse);
 
         await this.presenter.present(generateResponse, basePath, manualCodeResponse);
     }

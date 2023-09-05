@@ -15,11 +15,31 @@ export default class ImportGenerator {
     public generate(
         descriptors: Array<DescriptorEntity>,
         basePath: string,
-        config: ConfigEntity
+        config: ConfigEntity,
+        skipPathNormalization: boolean
     ): Array<ImportDeclaration> {
         const imports: Array<ImportEntity> = this.collectImports(descriptors);
 
-        return imports.map((i: ImportEntity) => this.generateImport(i, basePath, config));
+        return imports.map((i: ImportEntity) => this.generateImport(i, basePath, config, skipPathNormalization));
+    }
+
+    public generateImportList(
+        descriptors: Array<DescriptorEntity>,
+        imports: Array<ImportEntity>,
+        basePath: string,
+        config: ConfigEntity,
+        skipPathNormalization: boolean
+    ): Array<ImportDeclaration> {
+        const descriptorImports: Array<ImportEntity> = this.collectImports(descriptors);
+        const uniqueImports: Array<ImportEntity> = [];
+        for (const i of imports) {
+            let found = uniqueImports.find(x => x.alias.name == i.alias.name);
+            if (found !== undefined) continue;
+            found = descriptorImports.find(x => x.alias.name == i.alias.name);
+            if (found !== undefined) continue;
+            uniqueImports.push(i);
+        }
+        return uniqueImports.map((i: ImportEntity) => this.generateImport(i, basePath, config, skipPathNormalization));
     }
 
     private collectImports(descriptors: Array<DescriptorEntity>): Array<ImportEntity> {
@@ -35,15 +55,32 @@ export default class ImportGenerator {
         return imports;
     }
 
-    private generateImport(importItem: ImportEntity, basePath: string, config: ConfigEntity): ImportDeclaration {
-        let file: string = this.resolveImportPath(basePath, importItem, config);
+    private generateImport(
+        importItem: ImportEntity,
+        basePath: string,
+        config: ConfigEntity,
+        skipPathNormalization: boolean
+    ): ImportDeclaration {
+        let file: string = skipPathNormalization
+            ? importItem.file
+            : this.resolveImportPath(basePath, importItem, config);
 
         return TypeScript.factory.createImportDeclaration(
             undefined,
             TypeScript.factory.createImportClause(
                 false,
-                TypeScript.factory.createIdentifier(importItem.alias.name),
-                undefined
+                importItem.alias.isDefault ? TypeScript.factory.createIdentifier(importItem.alias.name) : undefined,
+                importItem.alias.isDefault == false
+                    ? TypeScript.factory.createNamedImports(
+                        [
+                            TypeScript.factory.createImportSpecifier(
+                                false,
+                                undefined,
+                                TypeScript.factory.createIdentifier(importItem.alias.name)
+                            )
+                        ]
+                    )
+                    : undefined
             ),
             TypeScript.factory.createStringLiteral(
                 file,

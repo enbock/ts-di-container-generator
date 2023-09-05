@@ -58,8 +58,12 @@ export default class TypeScript implements FileClient {
         );
         try {
             let sourceFile: SourceFile = this.loadFile(modulePath);
+            const descriptor: DescriptorEntity = new DescriptorEntity('');
             ts.forEachChild(sourceFile, (node: Node): void => {
-                this.namedInterfaceParser.parse(node, result, interfaceName);
+                this.parsers.forEach((task: Parser) => task.parse(node, descriptor));
+            });
+            ts.forEachChild(sourceFile, (node: Node): void => {
+                this.namedInterfaceParser.parse(node, result, interfaceName, descriptor.imports);
             });
         } catch (error) {
             CatchHelper.assert(error, FileError);
