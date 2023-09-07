@@ -38,10 +38,7 @@ export default class NamedInterfaceParser {
         if (
             ts.isTypeReferenceNode(propNode.type) == false
             && ts.isTypeQueryNode(propNode.type) == false
-        ) {
-            console.log('skip???>>>', propNode);
-            return;
-        }
+        ) return;
 
         const typeName: string = ts.isTypeReferenceNode(propNode.type)
             ? String(((propNode.type as TypeReferenceNode).typeName as Identifier).escapedText)
