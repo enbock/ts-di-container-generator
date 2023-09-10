@@ -1,7 +1,8 @@
 import FileName from 'Core/File/FileName';
 import DescriptorEntity from 'Core/DescriptorEntity';
 import ConfigEntity from 'Core/Configuration/ConfigEntity';
-import InterfaceNodeEntity from 'Core/File/InterfaceNodeEntity';
+import NodeEntity from 'Core/File/NodeEntity';
+import ManualCodeEntity from 'Core/ManualCodeUseCase/ManualCodeEntity';
 
 export class FileError extends Error {
 }
@@ -11,5 +12,15 @@ export default interface FileClient {
 
     makeImportPathsAbsolute(descriptor: DescriptorEntity, config: ConfigEntity): void;
 
-    extractInterface(basePath: string, containerFile: FileName, interfaceName: string): InterfaceNodeEntity;
+    extractInterface(basePath: string, containerFile: FileName, interfaceName: string): NodeEntity;
+
+    extractContainerConstructor(basePath: string, containerFile: FileName): NodeEntity;
+
+    extractContainerProperty(
+        basePath: string,
+        containerFile: FileName,
+        propertyName: string,
+        typeName: string,
+        data: ManualCodeEntity
+    ): void;
 }

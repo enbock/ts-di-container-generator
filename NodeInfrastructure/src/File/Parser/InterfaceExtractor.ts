@@ -8,11 +8,11 @@ import ts, {
     TypeQueryNode,
     TypeReferenceNode
 } from 'typescript';
-import InterfaceNodeEntity from 'Core/File/InterfaceNodeEntity';
+import NodeEntity from 'Core/File/NodeEntity';
 import {ImportEntity} from 'Core/DescriptorEntity';
 
-export default class NamedInterfaceParser {
-    public parse(node: Node, result: InterfaceNodeEntity, requestedName: string, imports: Array<ImportEntity>): void {
+export default class InterfaceExtractor {
+    public parse(node: Node, result: NodeEntity, requestedName: string, imports: Array<ImportEntity>): void {
         if (TypeScript.isInterfaceDeclaration(node) == false) return;
 
         const interfaceNode: InterfaceDeclaration = node as InterfaceDeclaration;

@@ -17,7 +17,7 @@ describe('InterfaceParser', function (): void {
     });
 
     it('should parse the interface', function (): void {
-        const testSource: string = 'interface TestInterface {}';
+        const testSource: string = 'export interface TestInterface {}';
         const sourceFile: SourceFile = TypeScript.createSourceFile('test', testSource, TypeScript.ScriptTarget.Latest);
 
         const result: DescriptorEntity = new DescriptorEntity('test');

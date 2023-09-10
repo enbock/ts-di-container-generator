@@ -14,7 +14,7 @@ import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/Interface
 
 describe('Interactor', function (): void {
     let interactor: Interactor,
-        statementGenerator: Spy<ContainerClassGenerator>,
+        containerClassGenerator: Spy<ContainerClassGenerator>,
         objectGenerator: Spy<ContainerObjectGenerator>,
         importGenerator: Spy<ImportGenerator>,
         fileExtractor: Spy<FileExtractor>,
@@ -22,14 +22,14 @@ describe('Interactor', function (): void {
     ;
 
     beforeEach(function (): void {
-        statementGenerator = mock<ContainerClassGenerator>();
+        containerClassGenerator = mock<ContainerClassGenerator>();
         objectGenerator = mock<ContainerObjectGenerator>();
         importGenerator = mock<ImportGenerator>();
         fileExtractor = mock<FileExtractor>();
         interfacePropertyGenerator = mock<InterfacePropertyGenerator>();
 
         interactor = new Interactor(
-            statementGenerator,
+            containerClassGenerator,
             objectGenerator,
             importGenerator,
             fileExtractor,
@@ -44,7 +44,7 @@ describe('Interactor', function (): void {
         interfacePropertyGenerator.generate.and.returnValue(['test::interfaceProperties:']);
         importGenerator.generate.and.returnValue(['test::importStatements:']);
         importGenerator.generateImportList.and.returnValue(['test::additionalImports']);
-        statementGenerator.generate.and.returnValue(['test::objectStatements']);
+        containerClassGenerator.generate.and.returnValue(['test::objectStatements']);
         fileExtractor.extract.and.callFake(
             function (
                 file: FileName,
@@ -61,7 +61,8 @@ describe('Interactor', function (): void {
             mainFile: 'test::targetFile:',
             basePath: 'test::basePath:',
             ignoreList: 'test::ignoreList:' as MockedObject,
-            additionalImports: 'test::extraImports' as MockedObject
+            additionalImports: 'test::extraImports' as MockedObject,
+            additionalContainerMembers: ['test::extraMembers' as MockedObject]
         };
         interactor.loadAndGenerate(request, response);
 
@@ -89,7 +90,8 @@ describe('Interactor', function (): void {
             'test::config',
             true
         );
-        expect(statementGenerator.generate).toHaveBeenCalledWith([
+        expect(containerClassGenerator.generate).toHaveBeenCalledWith([
+            'test::extraMembers',
             'test::interfaceProperties:',
             'test::objectMembers:'
         ]);

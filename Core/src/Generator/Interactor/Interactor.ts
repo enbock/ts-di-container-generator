@@ -23,7 +23,7 @@ interface StructureResult {
 
 export default class Interactor {
     constructor(
-        private statementGenerator: ContainerClassGenerator,
+        private containerClassGenerator: ContainerClassGenerator,
         private objectGenerator: ContainerObjectGenerator,
         private importGenerator: ImportGenerator,
         private fileExtractor: FileExtractor,
@@ -48,10 +48,15 @@ export default class Interactor {
         this.sanitizeDefaultImportAliases(descriptors, allImports);
         this.removeUnusedClasses(descriptors, allImports);
 
-        console.log('Failed:', failedDescriptors);
-        console.log('Loaded:', descriptors.join('\n'));
+        console.log('Failed:', failedDescriptors.length);
+        console.log('Loaded:', descriptors.length);
 
-        const data: StructureResult = this.generateStructure(request.basePath, descriptors, request.config);
+        const data: StructureResult = this.generateStructure(
+            request.basePath,
+            descriptors,
+            request.config,
+            request.additionalContainerMembers
+        );
         response.imports = [
             ...data.imports,
             ...this.importGenerator.generateImportList(
@@ -120,15 +125,17 @@ export default class Interactor {
     private generateStructure(
         basePath: string,
         descriptors: Array<DescriptorEntity>,
-        config: ConfigEntity
+        config: ConfigEntity,
+        manualMembers: Array<ClassElement>
     ): StructureResult {
-        const members: ClassElement[] = [
+        const members: Array<ClassElement> = [
+            ...manualMembers,
             ...this.interfacePropertyGenerator.generate(descriptors),
             ...this.objectGenerator.generate(descriptors)
         ];
         return {
             imports: this.importGenerator.generate(descriptors, basePath, config, false),
-            members: this.statementGenerator.generate(members)
+            members: this.containerClassGenerator.generate(members)
         };
     }
 }

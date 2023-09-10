@@ -6,6 +6,7 @@ import FileName from 'Core/File/FileName';
 import LanguageConfigUseCase from 'Core/Configuration/LanguageConfigUseCase/LanguageConfigUseCase';
 import ManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
 import ManualCodeResponse from 'App/Controller/ManualCodeResponse';
+import {ClassElement} from 'typescript';
 
 export default class Controller {
 
@@ -25,7 +26,11 @@ export default class Controller {
             basePath,
             mainFile,
             ignoreList,
-            Object.values(manualCodeResponse.code.manualCode).map(x => x.imports).flat()
+            Object.values(manualCodeResponse.interfaces.manualCode).map(x => x.imports).flat(),
+            [
+                ...Object.values(manualCodeResponse.properties.manualCode).map(x => x.node as ClassElement),
+                ...Object.values(manualCodeResponse.constructor.manualCode).map(x => x.node as ClassElement)
+            ]
         );
         const generateResponse: GenerateResponse = new GenerateResponse();
 

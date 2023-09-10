@@ -60,11 +60,15 @@ describe('ContainerObjectGenerator', function () {
             'private _classToCreate?: ClassToCreate;'
         );
         expect(code).toContain(
-            'public get classToCreate(): ClassToCreate { ' +
-            'if (this._classToCreate)' +
-            '\n        return this._classToCreate;' +
-            '\n    else' +
-            '\n        return this._classToCreate = new ClassToCreate(this.injectedClass, this.manualInjections.classToCreateNativeValue);'
+            'class OutputClass {\n' +
+            '    private _classToCreate?: ClassToCreate;\n' +
+            '    public get classToCreate(): ClassToCreate {\n' +
+            '        if (this._classToCreate)\n' +
+            '            return this._classToCreate;\n' +
+            '        else\n' +
+            '            return this._classToCreate = new ClassToCreate(this.injectedClass, this.manualInjections.classToCreateNativeValue);\n' +
+            '    }\n' +
+            '}\n'
         );
     });
 });

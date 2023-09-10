@@ -1,19 +1,19 @@
 import TypeScript, {Node, SourceFile} from 'typescript';
-import NamedInterfaceParser from 'Infrastructure/File/Parser/NamedInterfaceParser';
-import InterfaceNodeEntity from 'Core/File/InterfaceNodeEntity';
+import InterfaceExtractor from 'Infrastructure/File/Parser/InterfaceExtractor';
+import NodeEntity from 'Core/File/NodeEntity';
 import {AliasEntity, ImportEntity} from 'Core/DescriptorEntity';
 
-describe('NamedInterfaceParser', function (): void {
-    let parser: NamedInterfaceParser;
+describe('InterfaceExtractor', function (): void {
+    let parser: InterfaceExtractor;
 
     beforeEach(function () {
-        parser = new NamedInterfaceParser();
+        parser = new InterfaceExtractor();
     });
 
     it('should ignore wrong nodes', function (): void {
-        const result: InterfaceNodeEntity = new InterfaceNodeEntity('test');
+        const result: NodeEntity = new NodeEntity('test');
         parser.parse(TypeScript.factory.createJSDocComment(), result, 'test', []);
-        expect(result).toEqual(new InterfaceNodeEntity('test'));
+        expect(result).toEqual(new NodeEntity('test'));
     });
 
     it('should parse the interface', function (): void {
@@ -30,7 +30,7 @@ describe('NamedInterfaceParser', function (): void {
         const extraImport: ImportEntity = new ImportEntity('/path/file', new AliasEntity('ExtraName', '', true));
         const imports: Array<ImportEntity> = [defaultImport, subImport, typeImport, extraImport];
 
-        const result: InterfaceNodeEntity = new InterfaceNodeEntity('');
+        const result: NodeEntity = new NodeEntity('');
         let theNode: any;
 
         TypeScript.forEachChild(sourceFile, (node: Node): void => {

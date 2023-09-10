@@ -1,25 +1,28 @@
-import ts, {Node, Program, SourceFile} from 'typescript';
+import ts, {Node, SourceFile} from 'typescript';
 import path from 'path';
 import FileName from 'Core/File/FileName';
 import DescriptorEntity from 'Core/DescriptorEntity';
 import Parser from 'Infrastructure/File/Parser/Parser';
 import FileClient, {FileError} from 'Core/File/FileClient';
 import CatchHelper from 'Core/CatchHelper';
-import fs from 'fs';
-import ConfigEntity, {PathAlias} from 'Core/Configuration/ConfigEntity';
-import InterfaceNodeEntity from 'Core/File/InterfaceNodeEntity';
-import NamedInterfaceParser from 'Infrastructure/File/Parser/NamedInterfaceParser';
-
-class NotLoadable extends Error {
-}
+import ConfigEntity from 'Core/Configuration/ConfigEntity';
+import NodeEntity from 'Core/File/NodeEntity';
+import InterfaceExtractor from 'Infrastructure/File/Parser/InterfaceExtractor';
+import PropertyExtractor from 'Infrastructure/File/Parser/PropertyExtractor';
+import ClassConstructorExtractor from 'Infrastructure/File/Parser/ClassConstructorExtractor';
+import FileLoader from 'Infrastructure/File/Task/FileLoader';
+import ModulePathResolver from 'Infrastructure/File/Task/ModulePathResolver';
+import ManualCodeEntity from 'Core/ManualCodeUseCase/ManualCodeEntity';
 
 export default class TypeScript implements FileClient {
     constructor(
         private parsers: Parser[],
-        private resolve: typeof path.resolve,
         private dirname: typeof path.dirname,
-        private fileExistsSync: typeof fs.existsSync,
-        private namedInterfaceParser: NamedInterfaceParser
+        private interfaceExtractor: InterfaceExtractor,
+        private propertyExtractor: PropertyExtractor,
+        private classConstructorExtractor: ClassConstructorExtractor,
+        private fileLoader: FileLoader,
+        private modulePathResolver: ModulePathResolver
     ) {
     }
 
@@ -28,10 +31,16 @@ export default class TypeScript implements FileClient {
         file: FileName,
         config: ConfigEntity
     ): throwErrorOrReturn<FileError, DescriptorEntity> {
-        let modulePath: string = this.resolveModulePath(basePath, file, config);
-        let sourceFile: SourceFile = this.loadFile(modulePath);
-
+        let modulePath: string = this.modulePathResolver.resolvePath(basePath, file, config);
         const result: DescriptorEntity = new DescriptorEntity(modulePath);
+        let sourceFile: SourceFile;
+        try {
+            sourceFile = this.fileLoader.loadFile(modulePath);
+        } catch (error) {
+            CatchHelper.assert(error, FileError);
+            return result;
+        }
+
         ts.forEachChild(sourceFile, (node: Node): void => {
             this.parsers.forEach((task: Parser) => task.parse(node, result));
         });
@@ -42,13 +51,13 @@ export default class TypeScript implements FileClient {
     public makeImportPathsAbsolute(descriptor: DescriptorEntity, config: ConfigEntity): void {
         const dirname: string = this.dirname(descriptor.file);
         for (const i of descriptor.imports) {
-            i.file = this.resolveModulePath(dirname, i.file, config);
+            i.file = this.modulePathResolver.resolvePath(dirname, i.file, config);
         }
     }
 
-    public extractInterface(basePath: string, containerFile: FileName, interfaceName: string): InterfaceNodeEntity {
-        let modulePath: string = this.resolveModulePath(basePath, containerFile, new ConfigEntity());
-        const result: InterfaceNodeEntity = new InterfaceNodeEntity(interfaceName);
+    public extractInterface(basePath: string, containerFile: FileName, interfaceName: string): NodeEntity {
+        let modulePath: string = this.modulePathResolver.resolvePath(basePath, containerFile, new ConfigEntity());
+        const result: NodeEntity = new NodeEntity(interfaceName);
         result.node = ts.factory.createInterfaceDeclaration(
             undefined,
             interfaceName,
@@ -56,14 +65,15 @@ export default class TypeScript implements FileClient {
             undefined,
             []
         );
+
         try {
-            let sourceFile: SourceFile = this.loadFile(modulePath);
+            let sourceFile: SourceFile = this.fileLoader.loadFile(modulePath);
             const descriptor: DescriptorEntity = new DescriptorEntity('');
             ts.forEachChild(sourceFile, (node: Node): void => {
                 this.parsers.forEach((task: Parser) => task.parse(node, descriptor));
             });
             ts.forEachChild(sourceFile, (node: Node): void => {
-                this.namedInterfaceParser.parse(node, result, interfaceName, descriptor.imports);
+                this.interfaceExtractor.parse(node, result, interfaceName, descriptor.imports);
             });
         } catch (error) {
             CatchHelper.assert(error, FileError);
@@ -72,37 +82,45 @@ export default class TypeScript implements FileClient {
         return result;
     }
 
-    private loadFile(modulePath: string): throwErrorOrReturn<FileError, ts.SourceFile> {
-        let sourceFile: ts.SourceFile | undefined;
+    public extractContainerConstructor(basePath: string, containerFile: FileName): NodeEntity {
+        let modulePath: string = this.modulePathResolver.resolvePath(basePath, containerFile, new ConfigEntity());
+        const result: NodeEntity = new NodeEntity('constructor');
+        result.node = ts.factory.createConstructorDeclaration(
+            undefined,
+            [],
+            ts.factory.createBlock([], true)
+        );
         try {
-            sourceFile = this.tryLoadFile(modulePath, '.ts');
+            let sourceFile: SourceFile = this.fileLoader.loadFile(modulePath);
+            ts.forEachChild(sourceFile, (node: Node): void => {
+                this.classConstructorExtractor.parse(node, result, 'Container');
+            });
         } catch (error) {
-            CatchHelper.assert(error, NotLoadable);
-            try {
-                sourceFile = this.tryLoadFile(modulePath, '.tsx');
-            } catch (error) {
-                CatchHelper.assert(error, NotLoadable);
-                throw new FileError();
-            }
+            CatchHelper.assert(error, FileError);
         }
-        if (sourceFile === undefined) throw new FileError();
-        return sourceFile;
+
+        return result;
     }
 
-    private resolveModulePath(basePath: string, file: string, config: ConfigEntity): string {
-        const globalPathAlias: PathAlias | undefined = config.pathAliases.find(pa => pa.regExp.test(file));
-        if (globalPathAlias === undefined) return this.resolve(basePath, file);
-        return this.resolve(config.basePath, file.replace(globalPathAlias.regExp, globalPathAlias.targetPath));
-    }
+    public extractContainerProperty(
+        basePath: string,
+        containerFile: FileName,
+        propertyName: string,
+        typeName: string,
+        data: ManualCodeEntity
+    ): void {
+        let modulePath: string = this.modulePathResolver.resolvePath(basePath, containerFile, new ConfigEntity());
+        let sourceFile: SourceFile;
 
-    private tryLoadFile(modulePath: string, suffix: string): SourceFile | undefined {
-        const filePath: string = modulePath + suffix;
-        if (this.fileExistsSync(filePath) == false) throw new NotLoadable();
-        const program: Program = ts.createProgram([filePath], {allowJs: true});
-        const sourceFile: SourceFile | undefined = program.getSourceFile(filePath);
+        try {
+            sourceFile = this.fileLoader.loadFile(modulePath);
+        } catch (error) {
+            CatchHelper.assert(error, FileError);
+            sourceFile = ts.createSourceFile(modulePath, 'class Container {}', 99);
+        }
 
-        if (sourceFile === undefined) throw new NotLoadable();
-
-        return sourceFile;
+        ts.forEachChild(sourceFile, (node: Node): void => {
+            this.propertyExtractor.parse(node, propertyName, typeName, 'Container', data);
+        });
     }
 }

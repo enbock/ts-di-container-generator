@@ -13,7 +13,7 @@ import ManualCodeResponse from 'App/Controller/ManualCodeResponse';
 import ExtractRequest from 'Core/ManualCodeUseCase/ExtractRequest';
 import ExtractResponse from 'Core/ManualCodeUseCase/ExtractResponse';
 import ManualCodeEntity from 'Core/ManualCodeUseCase/ManualCodeEntity';
-import InterfaceNodeEntity from 'Core/File/InterfaceNodeEntity';
+import NodeEntity from 'Core/File/NodeEntity';
 
 describe('Controller', function (): void {
     let controller: Controller,
@@ -40,10 +40,21 @@ describe('Controller', function (): void {
     it('should generate TypeScript file', async function (): Promise<void> {
         let generateResponse: GenerateResponse = new GenerateResponse();
         let manualCodeResponse: ManualCodeResponse = new ManualCodeResponse();
-        const code: ManualCodeEntity = new ManualCodeEntity();
-        const interfaceNode: InterfaceNodeEntity = new InterfaceNodeEntity('test::code');
+
+        const interfaceCode: ManualCodeEntity = new ManualCodeEntity();
+        const interfaceNode: NodeEntity = new NodeEntity('test::code');
         interfaceNode.imports = ['test::import' as MockedObject];
-        code.manualCode['test::code'] = interfaceNode;
+        interfaceCode.manualCode['test::code'] = interfaceNode;
+
+        const constructorCode: ManualCodeEntity = new ManualCodeEntity();
+        const constructorNode: NodeEntity = new NodeEntity('test::code');
+        constructorNode.node = 'test::constructorNode' as MockedObject;
+        constructorCode.manualCode['test::code'] = constructorNode;
+
+        const propertyCode: ManualCodeEntity = new ManualCodeEntity();
+        const propertyNode: NodeEntity = new NodeEntity('test::code');
+        propertyNode.node = 'test::propertyNode' as MockedObject;
+        propertyCode.manualCode['test::code'] = propertyNode;
 
         configUseCase.getConfig.and.callFake(async function (response: ConfigResponse): Promise<void> {
             response.config = 'test::config' as MockedObject;
@@ -62,7 +73,9 @@ describe('Controller', function (): void {
         manualCodeUseCase.extractManualModifiableInterfaces.and.callFake(
             function (request: ExtractRequest, response: ExtractResponse): void {
                 manualCodeResponse = response;
-                response.code = code;
+                response.interfaces = interfaceCode;
+                response.constructor = constructorCode;
+                response.properties = propertyCode;
             }
         );
 
@@ -78,7 +91,7 @@ describe('Controller', function (): void {
             {basePath: 'test::basePath:'},
             manualCodeResponse
         );
-        expect(manualCodeResponse.code).toBe(code);
+        expect(manualCodeResponse.interfaces).toBe(interfaceCode);
         expect(presenter.present).toHaveBeenCalledWith(generateResponse, 'test::basePath:', manualCodeResponse);
     });
 });

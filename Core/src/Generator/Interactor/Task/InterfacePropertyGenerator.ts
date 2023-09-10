@@ -1,6 +1,6 @@
 import StringHelper from 'Core/StringHelper';
 import DescriptorEntity, {ClassEntity, InterfaceEntity, Type} from 'Core/DescriptorEntity';
-import TypeScript, {ClassElement, PropertyDeclaration, SyntaxKind} from 'typescript';
+import TypeScript, {ClassElement, GetAccessorDeclaration, SyntaxKind} from 'typescript';
 
 export default class InterfacePropertyGenerator {
     constructor(
@@ -8,7 +8,6 @@ export default class InterfacePropertyGenerator {
     ) {
     }
 
-    // idee: this.implementations.coreFileFileClient
     public generate(descriptorEntities: DescriptorEntity[]): ClassElement[] {
         return descriptorEntities.map(x => this.generateForFile(x)).flat();
     }
@@ -21,16 +20,23 @@ export default class InterfacePropertyGenerator {
         return givenInterfaces.map(x => this.generateProperty(x));
     }
 
-    private generateProperty(interfaceElement: InterfaceEntity): PropertyDeclaration {
-        return TypeScript.factory.createPropertyDeclaration(
+    private generateProperty(interfaceElement: InterfaceEntity): GetAccessorDeclaration {
+        return TypeScript.factory.createGetAccessorDeclaration(
             [
                 TypeScript.factory.createModifier(SyntaxKind.PublicKeyword)
             ],
             this.stringHelper.toCamelCase(interfaceElement.name),
-            undefined,
+            [],
             TypeScript.factory.createTypeReferenceNode(interfaceElement.name),
-            TypeScript.factory.createIdentifier(
-                'this.interfaceInstances.' + this.stringHelper.toCamelCase(interfaceElement.name)
+            TypeScript.factory.createBlock(
+                [
+                    TypeScript.factory.createReturnStatement(
+                        TypeScript.factory.createIdentifier(
+                            'this.interfaceInstances.' + this.stringHelper.toCamelCase(interfaceElement.name)
+                        )
+                    )
+                ],
+                true
             )
         );
     }

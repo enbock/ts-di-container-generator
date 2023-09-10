@@ -28,8 +28,12 @@ import ConfigParser from 'Infrastructure/Config/Parser';
 import ParseHelper from 'Infrastructure/ParseHelper';
 import * as process from 'process';
 import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
-import NamedInterfaceParser from 'Infrastructure/File/Parser/NamedInterfaceParser';
+import InterfaceExtractor from 'Infrastructure/File/Parser/InterfaceExtractor';
 import ManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
+import PropertyExtractor from 'Infrastructure/File/Parser/PropertyExtractor';
+import ClassConstructorExtractor from 'Infrastructure/File/Parser/ClassConstructorExtractor';
+import FileLoader from 'Infrastructure/File/Task/FileLoader';
+import ModulePathResolver from 'Infrastructure/File/Task/ModulePathResolver';
 
 class Container {
     private stringHelper: StringHelper = new StringHelper();
@@ -44,10 +48,16 @@ class Container {
             this.interfaceParser,
             this.rootDependencyParser
         ],
-        path.resolve,
         path.dirname,
-        fs.existsSync,
-        new NamedInterfaceParser()
+        new InterfaceExtractor(),
+        new PropertyExtractor(),
+        new ClassConstructorExtractor(),
+        new FileLoader(
+            fs.existsSync
+        ),
+        new ModulePathResolver(
+            path.resolve
+        )
     );
     private containerClassGenerator: ContainerClassGenerator = new ContainerClassGenerator();
     private objectGenerator: ContainerObjectGenerator = new ContainerObjectGenerator(
@@ -85,7 +95,6 @@ class Container {
         new InterfacePropertyGenerator(this.stringHelper)
     );
     private presenter: Presenter = new Presenter(
-        this.stringHelper,
         fs.promises.writeFile,
         path.resolve
     );
@@ -111,7 +120,11 @@ class Container {
                 'ManualInjections',
                 'InterfaceInstances',
                 'AdditionalResources'
-            ]
+            ],
+            {
+                manualInjections: 'ManualInjections',
+                interfaceInstances: 'InterfaceInstances & AdditionalResources'
+            }
         )
     );
 }

@@ -47,7 +47,11 @@ describe('InterfacePropertyGenerator', function () {
 
         const code: string = generateCode(result);
         expect(code).toContain(
-            'public interfaceToCreate: InterfaceToCreate = this.interfaceInstances.interfaceToCreate;'
+            'class OutputClass {\n' +
+            '    public get interfaceToCreate(): InterfaceToCreate {\n' +
+            '        return this.interfaceInstances.interfaceToCreate;\n' +
+            '    }\n' +
+            '}\n'
         );
     });
 });

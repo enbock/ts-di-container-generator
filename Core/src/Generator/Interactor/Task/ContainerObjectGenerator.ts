@@ -80,7 +80,8 @@ export default class ContainerObjectGenerator {
                             )
                         )
                     )
-                ]
+                ],
+                true
             )
         );
     }
