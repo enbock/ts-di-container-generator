@@ -61,6 +61,8 @@ describe('Presenter', function (): void {
         expect(writeFile).toHaveBeenCalledWith(
             'test::targetFile:.ts',
             `// @formatter:off
+// noinspection JSUnusedLocalSymbols,JSUnusedGlobalSymbols
+
 testProperty_imports;
 interface TestInterface {
 }

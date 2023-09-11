@@ -35,7 +35,9 @@ export default class Presenter {
             TypeScript.factory.createToken(SyntaxKind.EndOfFileToken),
             NodeFlags.None
         );
-        const code: string = '// @formatter:off\n' + this.printer.printNode(EmitHint.SourceFile, node, node);
+        const code: string = '// @formatter:off\n'+
+            '// noinspection JSUnusedLocalSymbols,JSUnusedGlobalSymbols\n\n' +
+            this.printer.printNode(EmitHint.SourceFile, node, node);
         await this.writeFile(targetFile, code, {flag: 'w'});
     }
 }

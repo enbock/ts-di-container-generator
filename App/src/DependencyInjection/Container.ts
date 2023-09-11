@@ -1,4 +1,6 @@
 // @formatter:off
+// noinspection JSUnusedLocalSymbols,JSUnusedGlobalSymbols
+
 import InfrastructureParseHelper from 'Infrastructure/ParseHelper';
 import InfrastructureConfigParser from 'Infrastructure/Config/Parser';
 import InfrastructureFileParserInterfaceExtractor from 'Infrastructure/File/Parser/InterfaceExtractor';
