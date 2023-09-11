@@ -1,6 +1,6 @@
 {
-  "name": "@enbock/ts-di-container-generator",
-  "version": "0.1.0",
+  "name": "ts-di-container-generator",
+  "version": "0.2.0-dev1",
   "license": "MIT",
   "author": "Endre Bock <endre@itbock.de>",
   "repository": {

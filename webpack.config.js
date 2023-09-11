@@ -37,7 +37,7 @@ const config = {
     alias: {
       App: path.resolve(__dirname, 'App/src'),
       Core: path.resolve(__dirname, 'Core/src'),
-      Infrastructure: path.resolve(__dirname, 'NodeInfrastructure/src')
+      Infrastructure: path.resolve(__dirname, 'Infrastructure/src')
     }
   }
 };

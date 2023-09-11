@@ -6,6 +6,7 @@
       <sourceFolder url="file://$MODULE_DIR$/App/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/Core/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/NodeInfrastructure/src" isTestSource="false" />
+      <sourceFolder url="file://$MODULE_DIR$/Infrastructure/src" isTestSource="false" />
       <excludeFolder url="file://$MODULE_DIR$/build" />
     </content>
     <orderEntry type="sourceFolder" forTests="false" />

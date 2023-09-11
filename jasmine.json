@@ -3,7 +3,7 @@
   "spec_files": [
     "App/src/**/*.test.ts",
     "Core/src/**/*.test.ts",
-    "NodeInfrastructure/src/**/*.test.ts"
+    "Infrastructure/src/**/*.test.ts"
   ],
   "helpers": [
   ],

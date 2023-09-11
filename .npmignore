@@ -1,7 +1,6 @@
 .idea
 jasmine.json
 *.test.*
-App/src/DependencyInjection/Container.ts
 *.iml
 *.ts
 tsconfig.json

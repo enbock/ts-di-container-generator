@@ -123,7 +123,7 @@ class Container {
             ],
             {
                 manualInjections: 'ManualInjections',
-                interfaceInstances: 'InterfaceInstances & AdditionalResources'
+                interfaceInstances: 'InterfaceInstances'
             }
         )
     );

@@ -37,7 +37,7 @@
         "Core/src/*"
       ],
       "Infrastructure/*": [
-        "NodeInfrastructure/src/*"
+        "Infrastructure/src/*"
       ]
     }
   },
@@ -45,7 +45,7 @@
     "Core/src/global.d.ts",
     "App/src/**/*",
     "Core/src/**/*",
-    "NodeInfrastructure/src/**/*"
+    "Infrastructure/src/**/*"
   ],
   "exclude": [
     "node_modules"

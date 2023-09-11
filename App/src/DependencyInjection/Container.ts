@@ -36,8 +36,10 @@ import fs from 'fs';
 import fsPromises from 'fs/promises';
 import process from 'process';
 import CoreFileFileClientTypeScript from 'Infrastructure/File/TypeScript';
+import MyTypeScript from 'Infrastructure/File/TypeScript';
 import CoreConfigurationConfigClientTypeScript from 'Infrastructure/Config/TypeScript';
 interface ManualInjections {
+    test: Array<MyTypeScript>;
     interfaceExtractor: InterfaceExtractor;
     propertyExtractor: PropertyExtractor;
     classConstructorExtractor: ClassConstructorExtractor;
@@ -96,7 +98,7 @@ class Container {
         ],
         coreManualCodeUseCaseManualCodeUseCasePropertyNames: {
             manualInjections: "ManualInjections",
-            interfaceInstances: "InterfaceInstances & AdditionalResources"
+            interfaceInstances: "InterfaceInstances"
         },
         controllerPresenterWriteFile: fsPromises.writeFile,
         controllerPresenterResolve: path.resolve,
