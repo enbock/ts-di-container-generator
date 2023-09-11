@@ -20,6 +20,7 @@ import ControllerPresenter from 'App/Controller/Presenter';
 import CoreConfigurationLanguageConfigUseCaseLanguageConfigUseCase from 'Core/Configuration/LanguageConfigUseCase/LanguageConfigUseCase';
 import CoreManualCodeUseCaseManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
 import ControllerController from 'App/Controller/Controller';
+import MyTypeScript from 'Infrastructure/File/TypeScript';
 import InterfaceExtractor from 'Infrastructure/File/Parser/InterfaceExtractor';
 import PropertyExtractor from 'Infrastructure/File/Parser/PropertyExtractor';
 import ClassConstructorExtractor from 'Infrastructure/File/Parser/ClassConstructorExtractor';
@@ -36,7 +37,6 @@ import fs from 'fs';
 import fsPromises from 'fs/promises';
 import process from 'process';
 import CoreFileFileClientTypeScript from 'Infrastructure/File/TypeScript';
-import MyTypeScript from 'Infrastructure/File/TypeScript';
 import CoreConfigurationConfigClientTypeScript from 'Infrastructure/Config/TypeScript';
 interface ManualInjections {
     test: Array<MyTypeScript>;

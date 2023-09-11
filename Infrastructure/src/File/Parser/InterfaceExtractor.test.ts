@@ -43,4 +43,26 @@ describe('InterfaceExtractor', function (): void {
         expect(result.node).toBe(theNode);
         expect(result.imports).toEqual([defaultImport, subImport, typeImport]);
     });
+
+    it('should extract array of type', function (): void {
+        const testSource: string = `interface Test {
+            arrayProp: Array<DefaultName>;
+        }`;
+        const sourceFile: SourceFile = TypeScript.createSourceFile('Test', testSource, TypeScript.ScriptTarget.Latest);
+        const defaultImport: ImportEntity = new ImportEntity('/path/file', new AliasEntity('DefaultName', '', true));
+        const imports: Array<ImportEntity> = [defaultImport];
+
+        const result: NodeEntity = new NodeEntity('');
+        let theNode: any;
+
+        TypeScript.forEachChild(sourceFile, (node: Node): void => {
+            if (theNode != undefined) return;
+            theNode = node;
+            parser.parse(node, result, 'Test', imports);
+        });
+
+        expect(result.name).toBe('Test');
+        expect(result.node).toBe(theNode);
+        expect(result.imports).toEqual([defaultImport]);
+    });
 });

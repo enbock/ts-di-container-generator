@@ -4,8 +4,10 @@ import ts, {
     InterfaceDeclaration,
     Node,
     PropertySignature,
+    Type,
     TypeElement,
     TypeQueryNode,
+    TypeReference,
     TypeReferenceNode
 } from 'typescript';
 import NodeEntity from 'Core/File/NodeEntity';
@@ -40,16 +42,29 @@ export default class InterfaceExtractor {
             && ts.isTypeQueryNode(propNode.type) == false
         ) return;
 
-        const typeName: string = ts.isTypeReferenceNode(propNode.type)
+        let typeName: string = ts.isTypeReferenceNode(propNode.type)
             ? String(((propNode.type as TypeReferenceNode).typeName as Identifier).escapedText)
             : String(((propNode.type as TypeQueryNode).exprName as Identifier).escapedText)
         ;
+
+        typeName = this.takeFromTypeArguments(propNode, typeName);
+
         const foundImport: ImportEntity | undefined = allImports.find(
-            x => x.alias.name == typeName || x.alias.origin == typeName
+            x => x.alias.name == typeName || (x.alias.origin != '' && x.alias.origin == typeName)
         );
         if (foundImport === undefined) return;
 
         if (neededImports.indexOf(foundImport) != -1) return;
         neededImports.push(foundImport);
+    }
+
+    private takeFromTypeArguments(propNode: ts.PropertySignature, typeName: string): string {
+        const typeArguments: readonly Type[] | undefined = (<TypeReference | undefined><unknown>propNode.type)?.typeArguments;
+        if (typeArguments == undefined || typeArguments.length == 0) return typeName;
+
+        const typeNode: TypeReferenceNode = <TypeReferenceNode><unknown>typeArguments[0];
+        if (ts.isTypeReferenceNode(typeNode) == false) return typeName;
+
+        return String((<Identifier>typeNode.typeName).escapedText);
     }
 }
