@@ -34,6 +34,8 @@ import PropertyExtractor from 'Infrastructure/File/Parser/PropertyExtractor';
 import ClassConstructorExtractor from 'Infrastructure/File/Parser/ClassConstructorExtractor';
 import FileLoader from 'Infrastructure/File/Task/FileLoader';
 import ModulePathResolver from 'Infrastructure/File/Task/ModulePathResolver';
+import AdditionalCreationUseCase from 'Core/Generator/AdditionalCreationUseCase/AdditionalCreationUseCase';
+import AdditionalResourcesExtractor from 'Core/Generator/Interactor/Task/AdditionalResourcesExtractor';
 
 class Container {
     private stringHelper: StringHelper = new StringHelper();
@@ -84,15 +86,17 @@ class Container {
             this.stringHelper
         )
     );
+    private fileExtractor: FileExtractor = new FileExtractor(
+        this.fileClient,
+        this.pathSanitizer
+    );
     private generatorInteractor: GeneratorInteractor = new GeneratorInteractor(
         this.containerClassGenerator,
         this.objectGenerator,
         this.importGenerator,
-        new FileExtractor(
-            this.fileClient,
-            this.pathSanitizer
-        ),
-        new InterfacePropertyGenerator(this.stringHelper)
+        this.fileExtractor,
+        new InterfacePropertyGenerator(this.stringHelper),
+        new AdditionalResourcesExtractor(this.fileExtractor)
     );
     private presenter: Presenter = new Presenter(
         fs.promises.writeFile,
@@ -125,7 +129,8 @@ class Container {
                 manualInjections: 'ManualInjections',
                 interfaceInstances: 'InterfaceInstances'
             }
-        )
+        ),
+        new AdditionalCreationUseCase()
     );
 }
 

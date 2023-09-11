@@ -11,6 +11,7 @@ import FileName from 'Core/File/FileName';
 import DescriptorEntity from 'Core/DescriptorEntity';
 import mock from 'Core/mock';
 import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
+import AdditionalResourcesExtractor from 'Core/Generator/Interactor/Task/AdditionalResourcesExtractor';
 
 describe('Interactor', function (): void {
     let interactor: Interactor,
@@ -18,7 +19,8 @@ describe('Interactor', function (): void {
         objectGenerator: Spy<ContainerObjectGenerator>,
         importGenerator: Spy<ImportGenerator>,
         fileExtractor: Spy<FileExtractor>,
-        interfacePropertyGenerator: Spy<InterfacePropertyGenerator>
+        interfacePropertyGenerator: Spy<InterfacePropertyGenerator>,
+        additionalResourcesExtractor: Spy<AdditionalResourcesExtractor>
     ;
 
     beforeEach(function (): void {
@@ -27,18 +29,21 @@ describe('Interactor', function (): void {
         importGenerator = mock<ImportGenerator>();
         fileExtractor = mock<FileExtractor>();
         interfacePropertyGenerator = mock<InterfacePropertyGenerator>();
+        additionalResourcesExtractor = mock<AdditionalResourcesExtractor>();
 
         interactor = new Interactor(
             containerClassGenerator,
             objectGenerator,
             importGenerator,
             fileExtractor,
-            interfacePropertyGenerator
+            interfacePropertyGenerator,
+            additionalResourcesExtractor
         );
     });
 
     it('should generate the container structure', async function (): Promise<void> {
         const descriptor: DescriptorEntity = new DescriptorEntity('test::descriptor:');
+        const importHolderDescriptor: DescriptorEntity = new DescriptorEntity('Import-Holder');
 
         objectGenerator.generate.and.returnValue(['test::objectMembers:']);
         interfacePropertyGenerator.generate.and.returnValue(['test::interfaceProperties:']);
@@ -54,6 +59,15 @@ describe('Interactor', function (): void {
                 parameters.descriptors.push(descriptor as MockedObject);
             }
         );
+        additionalResourcesExtractor.extract.and.callFake(
+            function extract(
+                additionalDescriptors: Array<DescriptorEntity>,
+                extractorParameters: ParameterBag,
+                importHolderDescriptor: DescriptorEntity
+            ): void {
+                expect(additionalDescriptors).toEqual(['test::extraDescriptor' as MockedObject]);
+            }
+        );
 
         const response: GenerateResponse = {statements: [], imports: []};
         const request: GenerateRequest = {
@@ -62,29 +76,32 @@ describe('Interactor', function (): void {
             basePath: 'test::basePath:',
             ignoreList: 'test::ignoreList:' as MockedObject,
             additionalImports: 'test::extraImports' as MockedObject,
-            additionalContainerMembers: ['test::extraMembers' as MockedObject]
+            additionalContainerMembers: ['test::extraMembers' as MockedObject],
+            additionalDescriptors: ['test::extraDescriptor' as MockedObject]
         };
         interactor.loadAndGenerate(request, response);
 
+        const expectedDescriptors: Array<DescriptorEntity> = [importHolderDescriptor, descriptor];
         expect(fileExtractor.extract).toHaveBeenCalledWith(
             'test::targetFile:',
             new ParameterBag(
                 'test::basePath:',
                 'test::ignoreList:' as MockedObject,
                 ['test::failedDescriptor:' as MockedObject],
-                [descriptor],
+                expectedDescriptors,
                 'test::config' as MockedObject
             )
         );
-        expect(objectGenerator.generate).toHaveBeenCalledWith([descriptor]);
+        expect(additionalResourcesExtractor.extract).toHaveBeenCalled();
+        expect(objectGenerator.generate).toHaveBeenCalledWith(expectedDescriptors);
         expect(importGenerator.generate).toHaveBeenCalledWith(
-            [descriptor],
+            expectedDescriptors,
             'test::basePath:',
             'test::config',
             false
         );
         expect(importGenerator.generateImportList).toHaveBeenCalledWith(
-            [descriptor],
+            expectedDescriptors,
             'test::extraImports' as MockedObject,
             'test::basePath:',
             'test::config',

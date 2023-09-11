@@ -7,6 +7,7 @@ import LanguageConfigUseCase from 'Core/Configuration/LanguageConfigUseCase/Lang
 import ManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
 import ManualCodeResponse from 'App/Controller/ManualCodeResponse';
 import {ClassElement} from 'typescript';
+import AdditionalCreationUseCase from 'Core/Generator/AdditionalCreationUseCase/AdditionalCreationUseCase';
 
 export default class Controller {
 
@@ -14,7 +15,8 @@ export default class Controller {
         private generatorInteractor: GeneratorInteractor,
         private presenter: Presenter,
         private configUseCase: LanguageConfigUseCase,
-        private manualCodeUseCase: ManualCodeUseCase
+        private manualCodeUseCase: ManualCodeUseCase,
+        private additionalCreationUseCase: AdditionalCreationUseCase
     ) {
     }
 
@@ -34,6 +36,7 @@ export default class Controller {
         );
         const generateResponse: GenerateResponse = new GenerateResponse();
 
+        this.additionalCreationUseCase.convertToDescriptor(manualCodeResponse, configResponseAndGenerateRequest);
         await this.configUseCase.getConfig(configResponseAndGenerateRequest);
         this.generatorInteractor.loadAndGenerate(configResponseAndGenerateRequest, generateResponse);
 

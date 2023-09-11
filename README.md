@@ -74,12 +74,89 @@ analyzer starts on the delivery side(see Clean Architecture), it can not identif
 for the interface.
 
 Therefore, you the to create for i.e. call chains or Infrastructure(Entity Gateway Interface implementations) instances,
-the objects by your own.
+the objects by your own **or** place "generate requests" by adding properties to the `AdditionalResources` interface.
 
-Fill the objects `interfaceInstances` and `manualInjections` with your project specific dependencies.
+Fill the objects `interfaceInstances` and `manualInjections` with your project specific or generated dependencies.
 
 Both objects will stay on while regeneration.
+
+## I have a resource, that need also data from `manualInjections`. How I can handle it?
+
+Yeah, here we got a cycle. If you need to fill resources into `manualInjections` which needs also resources **from**
+the `manualInjections`, then you can do follow way/trick:
+
+1. Fill the **second** resource with `undefined!`:
+   ```typescript
+    class Container {
+        // ***snip***
+        private manualInjections: ManualInjections = {
+            firstResource: new TheBaseResource(),
+            secondResource: undefined!
+        }
+        // ***snip***
+    }
+   ```
+2. Create in the container `constructure` function the **second** resource manually`
+   ```typescript
+    class Container {
+        // ***snip***
+        constructor() {
+            this.manualInjections.secondResource = new MyRequestedResource(this.manualInjections.firstResource)
+        }
+        // ***snip***
+    }
+   ```
 
 ## Can I update the DI container?
 
 Yes, just run this tool again.
+
+Follow elements will be taken from before generated container:
+
+* `ManualInjections`
+* `InterfaceInstances`
+* `AdditionalResources`
+* `private manualInjections: ManualInjections`
+* `private interfaceInstances: InterfaceInstances`
+* `constructor()`
+
+Also, the imports for the types of the `ManualInjections`, `InterfaceInstances` and `AdditionalResources` will be taken.
+
+## I want, that the generator create extra resources for me!
+
+That you can do!
+
+Just place a property in `AdditionalResources` and run the generator.
+Afterward you will find the generated resource. You can use it for fill, (as example) processing chains.
+
+*Be aware*, that the generated resource will get a global unique alias. Also, the property names
+in `AdditionalResources` will be ignored
+
+**Tip:** Replace your manual imported Class with the generated alias.
+
+Example:
+
+```typescript
+
+interface AdditionalResources {
+    // ***snip***
+    theFancyClassParser: InfrastructureFileParserClassParser;
+    infrastructureFileParserImportParser: InfrastructureFileParserImportParser;
+    infrastructureFileParserInterfaceParser: InfrastructureFileParserInterfaceParser;
+    infrastructureFileParserRootDependencyParser: InfrastructureFileParserRootDependencyParser;
+    // ***snip***
+}
+
+class Container {
+    private manualInjections: ManualInjections = {
+        // ***snip***
+        infrastructureFileTypeScriptParsers: [
+            this.infrastructureFileParserClassParser,
+            this.infrastructureFileParserImportParser,
+            this.infrastructureFileParserInterfaceParser,
+            this.infrastructureFileParserRootDependencyParser
+        ],
+        // ***snip***
+    }
+}
+```

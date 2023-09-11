@@ -2,10 +2,14 @@ import GenerateRequestInterface from 'Core/Generator/Interactor/GenerateRequest'
 import FileName from 'Core/File/FileName';
 import ConfigEntity from 'Core/Configuration/ConfigEntity';
 import ConfigResponseInterface from 'Core/Configuration/LanguageConfigUseCase/ConfigResponse';
-import {ImportEntity} from 'Core/DescriptorEntity';
+import DescriptorEntity, {ImportEntity} from 'Core/DescriptorEntity';
 import ts from 'typescript';
+import AdditionalCreationResponse from 'Core/Generator/AdditionalCreationUseCase/Response';
 
-export default class ConfigResponseAndGenerateRequest implements GenerateRequestInterface, ConfigResponseInterface {
+export default class ConfigResponseAndGenerateRequest implements GenerateRequestInterface,
+    ConfigResponseInterface,
+    AdditionalCreationResponse {
+    
     constructor(
         public basePath: string,
         public mainFile: FileName,
@@ -16,4 +20,5 @@ export default class ConfigResponseAndGenerateRequest implements GenerateRequest
     }
 
     public config: ConfigEntity = new ConfigEntity();
+    public additionalDescriptors: Array<DescriptorEntity> = [];
 }

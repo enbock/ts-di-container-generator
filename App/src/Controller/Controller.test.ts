@@ -14,13 +14,17 @@ import ExtractRequest from 'Core/ManualCodeUseCase/ExtractRequest';
 import ExtractResponse from 'Core/ManualCodeUseCase/ExtractResponse';
 import ManualCodeEntity from 'Core/ManualCodeUseCase/ManualCodeEntity';
 import NodeEntity from 'Core/File/NodeEntity';
+import AdditionalCreationUseCase from 'Core/Generator/AdditionalCreationUseCase/AdditionalCreationUseCase';
+import Request from 'Core/Generator/AdditionalCreationUseCase/Request';
+import Response from 'Core/Generator/AdditionalCreationUseCase/Response';
 
 describe('Controller', function (): void {
     let controller: Controller,
         generatorInteractor: Spy<GeneratorInteractor>,
         presenter: Spy<Presenter>,
         configUseCase: Spy<LanguageConfigUseCase>,
-        manualCodeUseCase: Spy<ManualCodeUseCase>
+        manualCodeUseCase: Spy<ManualCodeUseCase>,
+        additionalCreationUseCase: Spy<AdditionalCreationUseCase>
     ;
 
     beforeEach(function (): void {
@@ -28,12 +32,14 @@ describe('Controller', function (): void {
         presenter = mock<Presenter>();
         configUseCase = mock<LanguageConfigUseCase>();
         manualCodeUseCase = mock<ManualCodeUseCase>();
+        additionalCreationUseCase = mock<AdditionalCreationUseCase>();
 
         controller = new Controller(
             generatorInteractor,
             presenter,
             configUseCase,
-            manualCodeUseCase
+            manualCodeUseCase,
+            additionalCreationUseCase
         );
     });
 
@@ -68,14 +74,21 @@ describe('Controller', function (): void {
                 expect(request.ignoreList).toBe('test::ignoreList:');
                 expect(request.config).toBe('test::config' as MockedObject);
                 expect(request.additionalImports).toEqual(['test::import' as MockedObject]);
+                expect(request.additionalDescriptors).toBe('test::additionalDescriptors' as MockedObject);
             }
         );
         manualCodeUseCase.extractManualModifiableInterfaces.and.callFake(
             function (request: ExtractRequest, response: ExtractResponse): void {
-                manualCodeResponse = response;
+                manualCodeResponse = <ManualCodeResponse>response;
                 response.interfaces = interfaceCode;
                 response.constructor = constructorCode;
                 response.properties = propertyCode;
+            }
+        );
+        additionalCreationUseCase.convertToDescriptor.and.callFake(
+            function convertToDescriptor(request: Request, response: Response): void {
+                expect(request).toBe(manualCodeResponse);
+                response.additionalDescriptors = 'test::additionalDescriptors' as MockedObject;
             }
         );
 
@@ -86,6 +99,7 @@ describe('Controller', function (): void {
         );
 
         expect(configUseCase.getConfig).toHaveBeenCalled();
+        expect(additionalCreationUseCase.convertToDescriptor).toHaveBeenCalled();
         expect(generatorInteractor.loadAndGenerate).toHaveBeenCalled();
         expect(manualCodeUseCase.extractManualModifiableInterfaces).toHaveBeenCalledWith(
             {basePath: 'test::basePath:'},

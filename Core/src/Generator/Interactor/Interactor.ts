@@ -15,6 +15,7 @@ import FileExtractor, {ParameterBag} from 'Core/Generator/Interactor/Task/FileEx
 import FailedDescriptorEntity from 'Core/Generator/Interactor/FailedDescriptorEntity';
 import ConfigEntity from 'Core/Configuration/ConfigEntity';
 import InterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
+import AdditionalResourcesExtractor from 'Core/Generator/Interactor/Task/AdditionalResourcesExtractor';
 
 interface StructureResult {
     imports: Array<ts.Statement>;
@@ -27,22 +28,27 @@ export default class Interactor {
         private objectGenerator: ContainerObjectGenerator,
         private importGenerator: ImportGenerator,
         private fileExtractor: FileExtractor,
-        private interfacePropertyGenerator: InterfacePropertyGenerator
+        private interfacePropertyGenerator: InterfacePropertyGenerator,
+        private additionalResourcesExtractor: AdditionalResourcesExtractor
     ) {
     }
 
     public loadAndGenerate(request: GenerateRequest, response: GenerateResponse): void {
         const failedDescriptors: Array<FailedDescriptorEntity> = [];
-        let descriptors: Array<DescriptorEntity> = [];
-        this.fileExtractor.extract(
-            request.mainFile,
-            new ParameterBag(
-                request.basePath,
-                request.ignoreList,
-                failedDescriptors,
-                descriptors,
-                request.config
-            )
+        const importHolderDescriptor: DescriptorEntity = new DescriptorEntity('Import-Holder');
+        let descriptors: Array<DescriptorEntity> = [importHolderDescriptor];
+        const extractorParameters: ParameterBag = new ParameterBag(
+            request.basePath,
+            request.ignoreList,
+            failedDescriptors,
+            descriptors,
+            request.config
+        );
+        this.fileExtractor.extract(request.mainFile, extractorParameters);
+        this.additionalResourcesExtractor.extract(
+            request.additionalDescriptors,
+            extractorParameters,
+            importHolderDescriptor
         );
         const allImports: Array<ImportEntity> = this.getAllImports(descriptors);
         this.sanitizeDefaultImportAliases(descriptors, allImports);

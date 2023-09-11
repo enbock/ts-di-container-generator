@@ -1,6 +1,14 @@
 // @formatter:off
+import InfrastructureParseHelper from 'Infrastructure/ParseHelper';
+import InfrastructureConfigParser from 'Infrastructure/Config/Parser';
+import InfrastructureFileParserInterfaceExtractor from 'Infrastructure/File/Parser/InterfaceExtractor';
+import InfrastructureFileParserPropertyExtractor from 'Infrastructure/File/Parser/PropertyExtractor';
+import InfrastructureFileParserClassConstructorExtractor from 'Infrastructure/File/Parser/ClassConstructorExtractor';
+import InfrastructureFileTaskFileLoader from 'Infrastructure/File/Task/FileLoader';
+import InfrastructureFileTaskModulePathResolver from 'Infrastructure/File/Task/ModulePathResolver';
 import CoreFileFileClient from 'Core/File/FileClient';
 import CoreConfigurationConfigClient from 'Core/Configuration/ConfigClient';
+import CoreGeneratorInteractorTaskFileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
 import CoreStringHelper from 'Core/StringHelper';
 import CoreGeneratorSanitizerTaskGlobalImportRemover from 'Core/Generator/Sanitizer/Task/GlobalImportRemover';
 import CoreGeneratorSanitizerTaskIgnoredFileRemover from 'Core/Generator/Sanitizer/Task/IgnoredFileRemover';
@@ -13,14 +21,21 @@ import CoreGeneratorSanitizerSanitizerService from 'Core/Generator/Sanitizer/San
 import CoreGeneratorInteractorTaskContainerClassGenerator from 'Core/Generator/Interactor/Task/ContainerClassGenerator';
 import CoreGeneratorInteractorTaskContainerObjectGenerator from 'Core/Generator/Interactor/Task/ContainerObjectGenerator';
 import CoreGeneratorInteractorTaskImportGenerator from 'Core/Generator/Interactor/Task/ImportGenerator';
-import CoreGeneratorInteractorTaskFileExtractor from 'Core/Generator/Interactor/Task/FileExtractor';
 import CoreGeneratorInteractorTaskInterfacePropertyGenerator from 'Core/Generator/Interactor/Task/InterfacePropertyGenerator';
+import CoreGeneratorInteractorTaskAdditionalResourcesExtractor from 'Core/Generator/Interactor/Task/AdditionalResourcesExtractor';
 import CoreGeneratorInteractorInteractor from 'Core/Generator/Interactor/Interactor';
 import ControllerPresenter from 'App/Controller/Presenter';
 import CoreConfigurationLanguageConfigUseCaseLanguageConfigUseCase from 'Core/Configuration/LanguageConfigUseCase/LanguageConfigUseCase';
 import CoreManualCodeUseCaseManualCodeUseCase from 'Core/ManualCodeUseCase/ManualCodeUseCase';
+import CoreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase from 'Core/Generator/AdditionalCreationUseCase/AdditionalCreationUseCase';
 import ControllerController from 'App/Controller/Controller';
-import MyTypeScript from 'Infrastructure/File/TypeScript';
+import InfrastructureFileTypeScript from 'Infrastructure/File/TypeScript';
+import InfrastructureConfigTypeScript from 'Infrastructure/Config/TypeScript';
+import InfrastructureFileParserClassParser from 'Infrastructure/File/Parser/ClassParser';
+import InfrastructureFileParserImportParser from 'Infrastructure/File/Parser/ImportParser';
+import InfrastructureFileParserInterfaceParser from 'Infrastructure/File/Parser/InterfaceParser';
+import InfrastructureFileParserRootDependencyParser from 'Infrastructure/File/Parser/RootDependencyParser';
+import FileParser from 'Infrastructure/File/Parser/Parser';
 import InterfaceExtractor from 'Infrastructure/File/Parser/InterfaceExtractor';
 import PropertyExtractor from 'Infrastructure/File/Parser/PropertyExtractor';
 import ClassConstructorExtractor from 'Infrastructure/File/Parser/ClassConstructorExtractor';
@@ -30,16 +45,21 @@ import ClassParser from 'Infrastructure/File/Parser/ClassParser';
 import ImportParser from 'Infrastructure/File/Parser/ImportParser';
 import InterfaceParser from 'Infrastructure/File/Parser/InterfaceParser';
 import RootDependencyParser from 'Infrastructure/File/Parser/RootDependencyParser';
-import ConfigParser from 'Infrastructure/Config/Parser';
 import ParseHelper from 'Infrastructure/ParseHelper';
 import path from 'path';
 import fs from 'fs';
 import fsPromises from 'fs/promises';
 import process from 'process';
-import CoreFileFileClientTypeScript from 'Infrastructure/File/TypeScript';
-import CoreConfigurationConfigClientTypeScript from 'Infrastructure/Config/TypeScript';
 interface ManualInjections {
-    test: Array<MyTypeScript>;
+    infrastructureFileTypeScriptDirname: typeof path.dirname;
+    infrastructureFileTypeScriptParsers: Array<FileParser>;
+    infrastructureFileTaskFileLoaderFileExistsSync: typeof fs.existsSync;
+    infrastructureFileTaskModulePathResolverResolve: typeof path.resolve;
+    infrastructureConfigTypeScriptResolve: typeof path.resolve;
+    infrastructureConfigTypeScriptCwd: typeof process.cwd;
+    infrastructureConfigTypeScriptReadFile: typeof fsPromises.readFile;
+    infrastructureConfigTypeScriptFileExists: typeof fs.existsSync;
+    infrastructureConfigParserResolve: typeof path.resolve;
     interfaceExtractor: InterfaceExtractor;
     propertyExtractor: PropertyExtractor;
     classConstructorExtractor: ClassConstructorExtractor;
@@ -49,7 +69,6 @@ interface ManualInjections {
     importParser: ImportParser;
     interfaceParser: InterfaceParser;
     rootDependencyParser: RootDependencyParser;
-    configParser: ConfigParser;
     parseHelper: ParseHelper;
     path: typeof path;
     fs: typeof fs;
@@ -69,10 +88,16 @@ interface ManualInjections {
     coreGeneratorInteractorTaskImportGeneratorNormalize: typeof path.normalize;
 }
 interface InterfaceInstances {
-    coreFileFileClient: CoreFileFileClientTypeScript;
-    coreConfigurationConfigClient: CoreConfigurationConfigClientTypeScript;
+    coreFileFileClient: InfrastructureFileTypeScript;
+    coreConfigurationConfigClient: InfrastructureConfigTypeScript;
 }
 interface AdditionalResources {
+    infrastructureFileTypeScript: InfrastructureFileTypeScript;
+    infrastructureConfigTypeScript: InfrastructureConfigTypeScript;
+    infrastructureFileParserClassParser: InfrastructureFileParserClassParser;
+    infrastructureFileParserImportParser: InfrastructureFileParserImportParser;
+    infrastructureFileParserInterfaceParser: InfrastructureFileParserInterfaceParser;
+    infrastructureFileParserRootDependencyParser: InfrastructureFileParserRootDependencyParser;
 }
 class Container {
     private manualInjections: ManualInjections = {
@@ -90,7 +115,6 @@ class Container {
         interfaceParser: new InterfaceParser(),
         rootDependencyParser: new RootDependencyParser(),
         parseHelper: new ParseHelper(),
-        configParser: undefined!,
         coreManualCodeUseCaseManualCodeUseCaseArray: [
             "ManualInjections",
             "InterfaceInstances",
@@ -107,27 +131,131 @@ class Container {
         coreGeneratorSanitizerTaskNameGlobalizerNormalize: path.normalize,
         coreGeneratorInteractorTaskImportGeneratorResolve: path.resolve,
         coreGeneratorInteractorTaskImportGeneratorRelative: path.relative,
-        coreGeneratorInteractorTaskImportGeneratorNormalize: path.normalize
+        coreGeneratorInteractorTaskImportGeneratorNormalize: path.normalize,
+        infrastructureConfigParserResolve: path.resolve,
+        infrastructureConfigTypeScriptFileExists: fs.existsSync,
+        infrastructureConfigTypeScriptReadFile: fsPromises.readFile,
+        infrastructureConfigTypeScriptCwd: process.cwd,
+        infrastructureConfigTypeScriptResolve: path.resolve,
+        infrastructureFileTaskModulePathResolverResolve: path.resolve,
+        infrastructureFileTaskFileLoaderFileExistsSync: fs.existsSync,
+        infrastructureFileTypeScriptParsers: [
+            this.infrastructureFileParserClassParser,
+            this.infrastructureFileParserImportParser,
+            this.infrastructureFileParserInterfaceParser,
+            this.infrastructureFileParserRootDependencyParser
+        ],
+        infrastructureFileTypeScriptDirname: path.dirname
     };
-    private interfaceInstances: InterfaceInstances & AdditionalResources = {
-        coreFileFileClient: undefined!,
-        coreConfigurationConfigClient: undefined!
+    private interfaceInstances: InterfaceInstances = {
+        coreFileFileClient: this.infrastructureFileTypeScript,
+        coreConfigurationConfigClient: this.infrastructureConfigTypeScript
     };
     constructor() {
-        this.manualInjections.configParser = new ConfigParser(this.manualInjections.parseHelper, path.resolve);
-        this.interfaceInstances.coreFileFileClient = new CoreFileFileClientTypeScript([
-            this.manualInjections.classParser,
-            this.manualInjections.importParser,
-            this.manualInjections.interfaceParser,
-            this.manualInjections.rootDependencyParser
-        ], path.dirname, this.manualInjections.interfaceExtractor, this.manualInjections.propertyExtractor, this.manualInjections.classConstructorExtractor, this.manualInjections.fileLoader, this.manualInjections.modulePathResolver);
-        this.interfaceInstances.coreConfigurationConfigClient = new CoreConfigurationConfigClientTypeScript(fs.existsSync, fsPromises.readFile, this.manualInjections.configParser, process.cwd, path.resolve);
     }
     public get coreConfigurationConfigClient(): CoreConfigurationConfigClient {
         return this.interfaceInstances.coreConfigurationConfigClient;
     }
     public get coreFileFileClient(): CoreFileFileClient {
         return this.interfaceInstances.coreFileFileClient;
+    }
+    private _infrastructureFileParserRootDependencyParser?: InfrastructureFileParserRootDependencyParser;
+    public get infrastructureFileParserRootDependencyParser(): InfrastructureFileParserRootDependencyParser {
+        if (this._infrastructureFileParserRootDependencyParser)
+            return this._infrastructureFileParserRootDependencyParser;
+        else
+            return this._infrastructureFileParserRootDependencyParser = new InfrastructureFileParserRootDependencyParser();
+    }
+    private _infrastructureFileParserInterfaceParser?: InfrastructureFileParserInterfaceParser;
+    public get infrastructureFileParserInterfaceParser(): InfrastructureFileParserInterfaceParser {
+        if (this._infrastructureFileParserInterfaceParser)
+            return this._infrastructureFileParserInterfaceParser;
+        else
+            return this._infrastructureFileParserInterfaceParser = new InfrastructureFileParserInterfaceParser();
+    }
+    private _infrastructureFileParserImportParser?: InfrastructureFileParserImportParser;
+    public get infrastructureFileParserImportParser(): InfrastructureFileParserImportParser {
+        if (this._infrastructureFileParserImportParser)
+            return this._infrastructureFileParserImportParser;
+        else
+            return this._infrastructureFileParserImportParser = new InfrastructureFileParserImportParser();
+    }
+    private _infrastructureFileParserClassParser?: InfrastructureFileParserClassParser;
+    public get infrastructureFileParserClassParser(): InfrastructureFileParserClassParser {
+        if (this._infrastructureFileParserClassParser)
+            return this._infrastructureFileParserClassParser;
+        else
+            return this._infrastructureFileParserClassParser = new InfrastructureFileParserClassParser();
+    }
+    private _infrastructureParseHelper?: InfrastructureParseHelper;
+    public get infrastructureParseHelper(): InfrastructureParseHelper {
+        if (this._infrastructureParseHelper)
+            return this._infrastructureParseHelper;
+        else
+            return this._infrastructureParseHelper = new InfrastructureParseHelper();
+    }
+    private _infrastructureConfigParser?: InfrastructureConfigParser;
+    public get infrastructureConfigParser(): InfrastructureConfigParser {
+        if (this._infrastructureConfigParser)
+            return this._infrastructureConfigParser;
+        else
+            return this._infrastructureConfigParser = new InfrastructureConfigParser(this.infrastructureParseHelper, this.manualInjections.infrastructureConfigParserResolve);
+    }
+    private _infrastructureConfigTypeScript?: InfrastructureConfigTypeScript;
+    public get infrastructureConfigTypeScript(): InfrastructureConfigTypeScript {
+        if (this._infrastructureConfigTypeScript)
+            return this._infrastructureConfigTypeScript;
+        else
+            return this._infrastructureConfigTypeScript = new InfrastructureConfigTypeScript(this.manualInjections.infrastructureConfigTypeScriptFileExists, this.manualInjections.infrastructureConfigTypeScriptReadFile, this.infrastructureConfigParser, this.manualInjections.infrastructureConfigTypeScriptCwd, this.manualInjections.infrastructureConfigTypeScriptResolve);
+    }
+    private _infrastructureFileTaskModulePathResolver?: InfrastructureFileTaskModulePathResolver;
+    public get infrastructureFileTaskModulePathResolver(): InfrastructureFileTaskModulePathResolver {
+        if (this._infrastructureFileTaskModulePathResolver)
+            return this._infrastructureFileTaskModulePathResolver;
+        else
+            return this._infrastructureFileTaskModulePathResolver = new InfrastructureFileTaskModulePathResolver(this.manualInjections.infrastructureFileTaskModulePathResolverResolve);
+    }
+    private _infrastructureFileTaskFileLoader?: InfrastructureFileTaskFileLoader;
+    public get infrastructureFileTaskFileLoader(): InfrastructureFileTaskFileLoader {
+        if (this._infrastructureFileTaskFileLoader)
+            return this._infrastructureFileTaskFileLoader;
+        else
+            return this._infrastructureFileTaskFileLoader = new InfrastructureFileTaskFileLoader(this.manualInjections.infrastructureFileTaskFileLoaderFileExistsSync);
+    }
+    private _infrastructureFileParserClassConstructorExtractor?: InfrastructureFileParserClassConstructorExtractor;
+    public get infrastructureFileParserClassConstructorExtractor(): InfrastructureFileParserClassConstructorExtractor {
+        if (this._infrastructureFileParserClassConstructorExtractor)
+            return this._infrastructureFileParserClassConstructorExtractor;
+        else
+            return this._infrastructureFileParserClassConstructorExtractor = new InfrastructureFileParserClassConstructorExtractor();
+    }
+    private _infrastructureFileParserPropertyExtractor?: InfrastructureFileParserPropertyExtractor;
+    public get infrastructureFileParserPropertyExtractor(): InfrastructureFileParserPropertyExtractor {
+        if (this._infrastructureFileParserPropertyExtractor)
+            return this._infrastructureFileParserPropertyExtractor;
+        else
+            return this._infrastructureFileParserPropertyExtractor = new InfrastructureFileParserPropertyExtractor();
+    }
+    private _infrastructureFileParserInterfaceExtractor?: InfrastructureFileParserInterfaceExtractor;
+    public get infrastructureFileParserInterfaceExtractor(): InfrastructureFileParserInterfaceExtractor {
+        if (this._infrastructureFileParserInterfaceExtractor)
+            return this._infrastructureFileParserInterfaceExtractor;
+        else
+            return this._infrastructureFileParserInterfaceExtractor = new InfrastructureFileParserInterfaceExtractor();
+    }
+    private _infrastructureFileTypeScript?: InfrastructureFileTypeScript;
+    public get infrastructureFileTypeScript(): InfrastructureFileTypeScript {
+        if (this._infrastructureFileTypeScript)
+            return this._infrastructureFileTypeScript;
+        else
+            return this._infrastructureFileTypeScript = new InfrastructureFileTypeScript(this.manualInjections.infrastructureFileTypeScriptParsers, this.manualInjections.infrastructureFileTypeScriptDirname, this.infrastructureFileParserInterfaceExtractor, this.infrastructureFileParserPropertyExtractor, this.infrastructureFileParserClassConstructorExtractor, this.infrastructureFileTaskFileLoader, this.infrastructureFileTaskModulePathResolver);
+    }
+    private _coreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase?: CoreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase;
+    public get coreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase(): CoreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase {
+        if (this._coreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase)
+            return this._coreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase;
+        else
+            return this._coreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase = new CoreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase();
     }
     private _coreManualCodeUseCaseManualCodeUseCase?: CoreManualCodeUseCaseManualCodeUseCase;
     public get coreManualCodeUseCaseManualCodeUseCase(): CoreManualCodeUseCaseManualCodeUseCase {
@@ -149,6 +277,13 @@ class Container {
             return this._controllerPresenter;
         else
             return this._controllerPresenter = new ControllerPresenter(this.manualInjections.controllerPresenterWriteFile, this.manualInjections.controllerPresenterResolve);
+    }
+    private _coreGeneratorInteractorTaskAdditionalResourcesExtractor?: CoreGeneratorInteractorTaskAdditionalResourcesExtractor;
+    public get coreGeneratorInteractorTaskAdditionalResourcesExtractor(): CoreGeneratorInteractorTaskAdditionalResourcesExtractor {
+        if (this._coreGeneratorInteractorTaskAdditionalResourcesExtractor)
+            return this._coreGeneratorInteractorTaskAdditionalResourcesExtractor;
+        else
+            return this._coreGeneratorInteractorTaskAdditionalResourcesExtractor = new CoreGeneratorInteractorTaskAdditionalResourcesExtractor(this.coreGeneratorInteractorTaskFileExtractor);
     }
     private _coreGeneratorInteractorTaskInterfacePropertyGenerator?: CoreGeneratorInteractorTaskInterfacePropertyGenerator;
     public get coreGeneratorInteractorTaskInterfacePropertyGenerator(): CoreGeneratorInteractorTaskInterfacePropertyGenerator {
@@ -253,14 +388,14 @@ class Container {
         if (this._coreGeneratorInteractorInteractor)
             return this._coreGeneratorInteractorInteractor;
         else
-            return this._coreGeneratorInteractorInteractor = new CoreGeneratorInteractorInteractor(this.coreGeneratorInteractorTaskContainerClassGenerator, this.coreGeneratorInteractorTaskContainerObjectGenerator, this.coreGeneratorInteractorTaskImportGenerator, this.coreGeneratorInteractorTaskFileExtractor, this.coreGeneratorInteractorTaskInterfacePropertyGenerator);
+            return this._coreGeneratorInteractorInteractor = new CoreGeneratorInteractorInteractor(this.coreGeneratorInteractorTaskContainerClassGenerator, this.coreGeneratorInteractorTaskContainerObjectGenerator, this.coreGeneratorInteractorTaskImportGenerator, this.coreGeneratorInteractorTaskFileExtractor, this.coreGeneratorInteractorTaskInterfacePropertyGenerator, this.coreGeneratorInteractorTaskAdditionalResourcesExtractor);
     }
     private _controllerController?: ControllerController;
     public get controllerController(): ControllerController {
         if (this._controllerController)
             return this._controllerController;
         else
-            return this._controllerController = new ControllerController(this.coreGeneratorInteractorInteractor, this.controllerPresenter, this.coreConfigurationLanguageConfigUseCaseLanguageConfigUseCase, this.coreManualCodeUseCaseManualCodeUseCase);
+            return this._controllerController = new ControllerController(this.coreGeneratorInteractorInteractor, this.controllerPresenter, this.coreConfigurationLanguageConfigUseCaseLanguageConfigUseCase, this.coreManualCodeUseCaseManualCodeUseCase, this.coreGeneratorAdditionalCreationUseCaseAdditionalCreationUseCase);
     }
 }
 var DependencyInjectionContainer: Container = new Container();

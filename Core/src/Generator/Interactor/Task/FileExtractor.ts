@@ -27,7 +27,7 @@ export default class FileExtractor {
     public extract(
         file: FileName,
         parameters: ParameterBag
-    ): void {
+    ): DescriptorEntity {
         try {
             const descriptor: DescriptorEntity = this.fileClient.extract(parameters.basePath, file, parameters.config);
             this.sanitizerService.sanitizeDescriptor(
@@ -40,7 +40,7 @@ export default class FileExtractor {
             const amountRequirements: number = [...descriptor.requires.values()].length;
             if (amountRequirements == 0) {
                 this.removeFileFromRequirementsAndImports(parameters.descriptors, descriptor);
-                return;
+                return descriptor;
             }
 
             parameters.descriptors.unshift(descriptor);
@@ -51,9 +51,12 @@ export default class FileExtractor {
                 if (alreadyImported) continue;
                 this.extract(i.file, parameters);
             }
+
+            return descriptor;
         } catch (error) {
             CatchHelper.assert(error, FileError);
             parameters.failedDescriptors.push(new FailedDescriptorEntity(parameters.basePath, file));
+            return new DescriptorEntity('');
         }
     }
 
